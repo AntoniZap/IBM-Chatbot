@@ -1,6 +1,6 @@
 Software Engineering Project - Group 21
 ---------------------------------------------------------------------------------------------------------------------------------------------
-<img src="image.png" alt="Alt text" width="20" height="20"/> Customer Review Q+A ChatBot
+<img src="image.png" alt="Alt text" width="15" height="15"/> Customer Review Q+A ChatBot
 
 An Overview of Project 30 - 
 --------------------------------------------------------------------------------------------------------------------------------------------  
