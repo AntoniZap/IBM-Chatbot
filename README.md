@@ -1,12 +1,12 @@
 Software Engineering Project - Group 21
 ---------------------------------------------------------------------------------------------------------------------------------------------
-<img src="image.png" alt="Alt text" width="10" height="10"/> Customer Review Q+A ChatBot
+<img src="image.png" alt="Alt text" width="20" height="20"/> Customer Review Q+A ChatBot
 
 An Overview of Project 30 - 
 --------------------------------------------------------------------------------------------------------------------------------------------  
 3️⃣ Third Years
  - Della Doherty (dohertd6@tcd.ie) - ICS
- - Darragh Condron (dcliffor@tcd.ie) - ICS
+ - Darragh Clifford (dcliffor@tcd.ie) - ICS
  - Antoni Zapedowski (zapedowa@tcd.ie) - ICS
  - Chinaza Uzoukwu (uzoukwuc@tcd.ie) - ICS
  - Sprina Chen (chensp@tcd.ie) - CSB
