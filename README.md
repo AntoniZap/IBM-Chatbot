@@ -49,5 +49,5 @@ If you are using chatgpt, make sure you set the `LLM` environment variable to `C
 
 ```
 . .env.template
-streamlit run query.py
+streamlit run ChatbotConcept.py
 ```
