@@ -60,10 +60,9 @@ def get_llm():
             verbose = True,
             n_ctx=1024,
         )
-    else:
+    elif os.getenv("LLM") == "CHATGPT":
         from langchain_openai import ChatOpenAI
         llm = ChatOpenAI(temperature = 0.6)
-        
     return llm
 
 @st.cache_resource()
@@ -79,7 +78,13 @@ def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
 
 db = get_db()
-llm = get_llm()
+global test_mode
+if os.getenv("LLM") != "TESTING":
+    llm = get_llm()
+    test_mode = False
+else:
+    print("UI test mode, not testing LLM.")
+    test_mode = True
 memory = get_memory()
 options = get_options()
 
@@ -102,10 +107,11 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 retriever = db.as_retriever(k=1)
-document_chain = create_stuff_documents_chain(llm, prompt)
-retrieval_chain = RunnablePassthrough \
-    .assign(context=query_chain(retriever)) \
-    .assign(answer=document_chain)
+if test_mode == False:
+    document_chain = create_stuff_documents_chain(llm, prompt)
+    retrieval_chain = RunnablePassthrough \
+        .assign(context=query_chain(retriever)) \
+        .assign(answer=document_chain)
 
 for message in memory.messages:
     if type(message) is HumanMessage:
