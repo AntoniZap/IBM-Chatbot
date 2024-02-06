@@ -28,7 +28,7 @@ class Datafiniti:
         'reviews.id', # irrelevant
         'reviews.numHelpful', # needs context
         'reviews.rating', # needs context / bound for LLM (have prompt to provide this later),
-        '\ufeffid' # irrelevant
+        'id' # irrelevant
     ]
     
     def __init__(self, path):
@@ -39,7 +39,7 @@ class Datafiniti:
         Loads the provided CSV with the unwanted paths used as metadata returns a list of
         langchain documents for each CSV row. Uses CSVLoader internally.
         """
-        loader = CSVLoader(self.path, metadata_columns=self.unwanted)
+        loader = CSVLoader(self.path, metadata_columns=self.unwanted, encoding="utf-8-sig")
         documents = loader.load()
         return documents
 
