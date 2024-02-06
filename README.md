@@ -32,6 +32,8 @@ python3 -m venv env
 . env/bin/activate
 pip3 install torch --index-url https://download.pytorch.org/whl/cpu
 pip3 install -r requirements.txt
+pip3 install sentence_transformers
+pip3 install langchain_openai
 ```
 
 Failing to install torch the way described above may result in your VENV being populated with NVIDIA drivers that you likely do not need.
