@@ -60,7 +60,7 @@ class Datafiniti:
                     reviews.append(review)
             
         with open(output_path or f"normal.{self.path}", "w") as csv_file:
-            writer = csv.DictWriter(s, fieldnames)
+            writer = csv.DictWriter(csv_file, fieldnames)
             writer.writeheader()
             for review in reviews:
                 writer.writerow(review)
