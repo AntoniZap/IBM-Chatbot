@@ -46,6 +46,7 @@ The program will for a csv with the name `Datafiniti_Amazon_Consumer_Reviews_of_
 You need to modify `.env.template`.
 If you are using LLaMa set the `LLM` environment variable to `LLAMA` and make sure that the `LLAMA_MODEL_PATH` environment variable points to the `gguf` files corresponding to the model that you want to use.
 If you are using chatgpt, make sure you set the `LLM` environment variable to `CHATGPT` and set `OPENAI_API_KEY` to your OpenAI API key.
+If you are using AI21 llm, make sure you set the `LLM` environment variable to `AI21` and set `AI21_API_KEY` to your AI21 API key.
 
 ## Running
 
