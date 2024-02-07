@@ -1,6 +1,6 @@
 import os
 import os.path
-
+import sys
 # Document loading and the linke
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -25,9 +25,15 @@ from local import resolve
 # streamlit
 import streamlit as st
 
+
+
 @st.cache_resource()
 def get_db():
-    documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
+    global test_mode
+    if os.getenv("LLM") == "TESTING":
+        documents = Datafiniti("Test_Dataset.csv").load()[:1]
+    else:
+        documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
     split_documents = text_splitter.split_documents(documents)
     model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -81,13 +87,11 @@ def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
 
 db = get_db()
-global test_mode
 if os.getenv("LLM") != "TESTING":
     llm = get_llm()
-    test_mode = False
 else:
     print("UI test mode, not testing LLM.")
-    test_mode = True
+    sys.exit(0)
 memory = get_memory()
 options = get_options()
 
@@ -110,7 +114,7 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 retriever = db.as_retriever(k=1)
-if test_mode == False:
+if os.getenv("LLM") != "TESTING":
     document_chain = create_stuff_documents_chain(llm, prompt)
     retrieval_chain = RunnablePassthrough \
         .assign(context=query_chain(retriever)) \

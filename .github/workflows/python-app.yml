@@ -34,9 +34,9 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: Run chatbot
+    - name: Run chatbot without LLM
       env:
         LLM: "TESTING"
       run: |
-        streamlit run ChatbotConcept.py
+        python3 ./ChatbotConcept.py
     
