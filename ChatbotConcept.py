@@ -63,6 +63,9 @@ def get_llm():
     elif os.getenv("LLM") == "CHATGPT":
         from langchain_openai import ChatOpenAI
         llm = ChatOpenAI(temperature = 0.6)
+    elif os.getenv("LLM") == "AI21":
+       from langchain.llms import AI21
+       llm = AI21(temperature=0)
     return llm
 
 @st.cache_resource()
