@@ -20,3 +20,36 @@ An Overview of Project 30 -
  - Dylan Martin (martindy@tcd.ie) -
 
 # ibm-sweng
+
+# chinaza/RAG-chromadb
+
+## Setup
+
+Reccomended CPU prerequisite setup.
+
+```
+python3 -m venv env
+. env/bin/activate
+pip3 install torch --index-url https://download.pytorch.org/whl/cpu
+pip3 install -r requirements.txt
+pip3 install sentence_transformers
+pip3 install langchain_openai
+```
+
+Failing to install torch the way described above may result in your VENV being populated with NVIDIA drivers that you likely do not need.
+If you do have an nvidia GPU, feel free to ommit the explicit torch install, as you may be able to run the code faster with CUDA.
+
+Download the "Datafiniti" CSV file from [here](https://data.world/datafiniti/consumer-reviews-of-amazon-products).
+Place it in the project root driectory.
+The program will for a csv with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
+
+You need to modify `.env.template`.
+If you are using LLaMa set the `LLM` environment variable to `LLAMA` and make sure that the `LLAMA_MODEL_PATH` environment variable points to the `gguf` files corresponding to the model that you want to use.
+If you are using chatgpt, make sure you set the `LLM` environment variable to `CHATGPT` and set `OPENAI_API_KEY` to your OpenAI API key.
+
+## Running
+
+```
+. .env.template
+streamlit run ChatbotConcept.py
+```
