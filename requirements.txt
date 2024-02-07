@@ -6,3 +6,4 @@ torch
 sentence_transformers
 llama-cpp-python
 chromadb
+langchain_openai
