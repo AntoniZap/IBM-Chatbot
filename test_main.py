@@ -4,7 +4,7 @@
 import os
 from dotenv import load_dotenv
 import config
-from ChatbotConcept import get_db,get_llm, get_memory
+from ChatbotConcept import get_llm, get_memory
 
 def test_basic_example():
     assert 2 + 2 == 4

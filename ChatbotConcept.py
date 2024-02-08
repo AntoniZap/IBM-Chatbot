@@ -29,8 +29,9 @@ import streamlit as st
 
 @st.cache_resource()
 def get_db():
+    import config
     global test_mode
-    if os.getenv("LLM") == "TESTING":
+    if config.LLM == "TESTING":
         documents = Datafiniti("Test_Dataset.csv").load()[:1]
     else:
         documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
@@ -56,21 +57,21 @@ def get_db():
 @st.cache_resource()
 def get_llm():
     import config
-    if os.getenv("LLM") == "LLAMA":
+    if config.LLM == "LLAMA":
         from langchain_community.llms import LlamaCpp
         from langchain.callbacks.manager import CallbackManager
         from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
         llm = LlamaCpp(
-            model_path=os.getenv("LLAMA_MODEL_PATH"),
+            model_path=config.LLAMA_MODEL_PATH,
             callback_manager = callback_manager,
             verbose = True,
             n_ctx=1024,
         )
-    elif os.getenv("LLM") == "CHATGPT":
+    elif config.LLM == "CHATGPT":
         from langchain_openai import ChatOpenAI
         llm = ChatOpenAI(temperature = 0.6)
-    elif os.getenv("LLM") == "AI21":
+    elif config.LLM == "AI21":
        from langchain.llms import AI21
        llm = AI21(temperature=0)
     return llm
@@ -86,9 +87,9 @@ def get_options():
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
-
+import config
 db = get_db()
-if os.getenv("LLM") != "TESTING":
+if config.LLM != "TESTING":
     llm = get_llm()
 else:
     print("UI test mode, not testing LLM.")
@@ -115,7 +116,7 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 retriever = db.as_retriever(k=1)
-if os.getenv("LLM") != "TESTING":
+if config.LLM != "TESTING":
     document_chain = create_stuff_documents_chain(llm, prompt)
     retrieval_chain = RunnablePassthrough \
         .assign(context=query_chain(retriever)) \
@@ -138,11 +139,11 @@ memory.add_user_message(question)
 # print("QUESTION IS: ", question)
 with st.chat_message(resolve(options["language"], "user_role_label")):
     st.markdown(question)
-    
+
 payload = { "messages": memory.messages }
 with st.chat_message(resolve(options["language"], "assistant_role_label")):
     element = st.empty()
-    
+
 st.subheader(resolve(options["language"], "sources"))
 context = st.empty()
 
@@ -160,7 +161,7 @@ with st.spinner(resolve(options["language"], "loading")):
             context.write([doc.page_content for doc in full["context"]])
         print(item)
     st.write("\n")
-    
+
 
 if full is not None:
     if type(full) is str:
