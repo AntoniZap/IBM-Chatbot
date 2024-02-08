@@ -14,7 +14,7 @@ function App() {
               <nav className="nav nav-masthead justify-content-center">
                 <a className="nav-link active">Insert Document</a>
                 <a className="nav-link">Chat With Me</a>
-                <a className="nav-link">Home</a>
+                <a className="nav-link">About Us</a>
               </nav>
             </div>
           </header>
