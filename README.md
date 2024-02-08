@@ -21,8 +21,6 @@ An Overview of Project 30 -
 
 # ibm-sweng
 
-# chinaza/RAG-chromadb
-
 ## Setup
 
 Reccomended CPU prerequisite setup.
@@ -53,4 +51,7 @@ If you are using AI21 llm, make sure you set the `LLM` environment variable to `
 ```
 . .env.template
 streamlit run ChatbotConcept.py
+
+Please run the commands using bash, rather than powershell as it might not work using powershell (windows devices).
+
 ```
