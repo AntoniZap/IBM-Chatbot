@@ -25,13 +25,15 @@ from local import resolve
 # streamlit
 import streamlit as st
 
+import config
 
+config.config()
 
 @st.cache_resource()
 def get_db():
-    import config
+
     global test_mode
-    if config.LLM == "TESTING":
+    if  os.getenv('LLM') == "TESTING":
         documents = Datafiniti("Test_Dataset.csv").load()[:1]
     else:
         documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
@@ -57,21 +59,21 @@ def get_db():
 @st.cache_resource()
 def get_llm():
     import config
-    if config.LLM == "LLAMA":
+    if os.getenv('LLM') == "LLAMA":
         from langchain_community.llms import LlamaCpp
         from langchain.callbacks.manager import CallbackManager
         from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
         llm = LlamaCpp(
-            model_path=config.LLAMA_MODEL_PATH,
+            model_path= os.getenv('LLAMA_MODEL_PATH'),
             callback_manager = callback_manager,
             verbose = True,
             n_ctx=1024,
         )
-    elif config.LLM == "CHATGPT":
+    elif os.getenv('LLM') == "CHATGPT":
         from langchain_openai import ChatOpenAI
         llm = ChatOpenAI(temperature = 0.6)
-    elif config.LLM == "AI21":
+    elif os.getenv('LLM') == "AI21":
        from langchain.llms import AI21
        llm = AI21(temperature=0)
     return llm
@@ -89,7 +91,7 @@ def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
 import config
 db = get_db()
-if config.LLM != "TESTING":
+if os.getenv('LLM') != "TESTING":
     llm = get_llm()
 else:
     print("UI test mode, not testing LLM.")
@@ -116,7 +118,7 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 retriever = db.as_retriever(k=1)
-if config.LLM != "TESTING":
+if os.getenv('LLM') != "TESTING":
     document_chain = create_stuff_documents_chain(llm, prompt)
     retrieval_chain = RunnablePassthrough \
         .assign(context=query_chain(retriever)) \
