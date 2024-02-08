@@ -55,6 +55,7 @@ def get_db():
 
 @st.cache_resource()
 def get_llm():
+    import config
     if os.getenv("LLM") == "LLAMA":
         from langchain_community.llms import LlamaCpp
         from langchain.callbacks.manager import CallbackManager
