@@ -1,10 +1,7 @@
 #UNIT TESTS
 
 #Need to import function that's used in the tests
-import os
-from dotenv import load_dotenv
-import config
-from ChatbotConcept import get_llm, get_memory
+from ChatbotConcept import get_memory, get_db, get_llm
 
 def test_basic_example():
     assert 2 + 2 == 4
