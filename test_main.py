@@ -12,7 +12,6 @@ def test_basic_example():
 
 def test_get_db():
     import os
-    config.config()
     a = os.getenv("LLM")
     b = os.getenv("LLAMA_MODEL_PATH")
     c = os.getenv("OPENAI_API_KEY")
