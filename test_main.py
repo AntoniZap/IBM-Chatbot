@@ -1,22 +1,19 @@
 #UNIT TESTS
-import ChatbotConcept
+
+import ChatbotHelper
 import config
-
-
-#Need to import function that's used in the tests
-#from ChatbotConcept import *
+import os
 
 
 def test_basic_example():
     assert 2 + 2 == 4
 
 def test_get_db():
-    import os
     a = os.getenv("LLM")
     b = os.getenv("LLAMA_MODEL_PATH")
     c = os.getenv("OPENAI_API_KEY")
     d = os.getenv("AI21_API_KEY")
-    ChatbotConcept.get_db()
+    ChatbotHelper.get_db()
     assert 2 + 2 == 4
 
 def test_get_llm():
