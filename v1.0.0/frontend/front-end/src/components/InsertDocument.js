@@ -12,8 +12,8 @@ function FileUpload() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const fileContent = e.target.result;
-      const fileName = 'my-file.pdf'; // Set your desired file name
-      const blob = new Blob([fileContent], { type: 'application/pdf' });
+      const fileName = 'my-file.csv'; // Set your desired file name
+      const blob = new Blob([fileContent], { type: 'text/csv' });
       saveAs(blob, fileName); // Save the file using file-saver
     };
     reader.readAsArrayBuffer(file);
@@ -21,9 +21,9 @@ function FileUpload() {
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
+      <input type="file" accept=".csv" onChange={handleFileChange} />
       <button onClick={() => document.querySelector('input[type="file"]').click()}>
-        Upload PDF
+        Upload CSV
       </button>
     </div>
   );
