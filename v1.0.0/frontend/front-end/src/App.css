@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+/* Add this to your App.css file */
+
+.App .member .profile-icon {
+  width: 15px; /* Adjust as needed */
+  height: 15px; /* Adjust as needed */
+}
+
+.App .member .member-name,
+.App .member .member-role,
+.App .member .member-about {
+  font-size: 14px; /* Adjust as needed */
+}

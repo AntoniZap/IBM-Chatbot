@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 import InsertDocument from './components/InsertDocument';
 import ChatWithMe from './components/ChatWithMe';
 import AboutUs from './components/AboutUs';
-import logo from './logo.svg';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 
@@ -30,7 +29,7 @@ function App() {
                 <Route path="/" element={
                   <>
                     <h1 className="cover-heading">Welcome to Group 21's AI chatbot</h1>
-                    <p className="lead">Welcome to the Chatbot designed by Group 21 as part of our work with IBM and Large Language Models. Just insert your document and ask as many questions as you want!</p>
+                    <p className="lead">Welcome to the Chatbot designed by Group 21 as part of our work with IBM and Large Language Models. To start just insert your document and ask as many questions as you want!</p>
                     <p className="lead">
                       <a href="https://elastic.co/what-is/large-language-models" className="btn btn-lg btn-secondary">Learn more</a>
                     </p>

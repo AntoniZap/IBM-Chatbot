@@ -1,11 +1,44 @@
 import React from 'react';
+import ProfileIcon from '../ProfileIcon.png';
+import JaedonSWENG from '../JaedonSWENG.jpg';
+import './AboutUs.css'; // Import the CSS file
+
+
+
+
+const teamMembers = [
+  // Add your team members here
+  { name: 'Jaedon Paget', role: 'Frontend lead', about: 'I am a 3rd year ICS student here at Trinity. For this project I was tasked with the devolpment of the frontend. I throughly enjoyed my time with the group and with IBM.', image: JaedonSWENG },
+  { name: 'Member 2', role: 'Role 2', about: 'About Member 2', image: ProfileIcon},
+  { name: 'Member 3', role: 'Role 3', about: 'About Member 3', image: ProfileIcon },
+  { name: 'Member 4', role: 'Role 4', about: 'About Member 4', image: ProfileIcon },
+  { name: 'Member 5', role: 'Role 5', about: 'About Member 5', image: ProfileIcon },
+  { name: 'Member 6', role: 'Role 6', about: 'About Member 6', image: ProfileIcon },
+  { name: 'Member 7', role: 'Role 7', about: 'About Member 7', image: ProfileIcon },
+  { name: 'Member 8', role: 'Role 8', about: 'About Member 8', image: ProfileIcon },
+  { name: 'Member 9', role: 'Role 9', about: 'About Member 9', image: ProfileIcon },
+  { name: 'Member 10', role: 'Role 10', about: 'About Member 10', image: ProfileIcon },
+  { name: 'Member 11', role: 'Role 11', about: 'About Member 11', image: ProfileIcon },
+  { name: 'Member 12', role: 'Role 12', about: 'About Member 12', image: ProfileIcon },
+
+  // ...
+  // Repeat for all 12 members
+];
 
 function AboutUs() {
   return (
-    <div>
-      <h1>About Us Page</h1>
+    <div className="member-container">
+      {teamMembers.map((member, index) => (
+        <div key={index} className="member">
+          <img src={member.image} alt={member.name} className="profile-icon" /> {/* Use the image from the member object */}
+          <h2 className="member-name">{member.name}</h2>
+          <h3 className="member-role">{member.role}</h3>
+          <p className="member-about">{member.about}</p>
+        </div>
+      ))}
     </div>
   );
 }
+
 
 export default AboutUs;
