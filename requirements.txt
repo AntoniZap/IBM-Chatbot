@@ -1,0 +1,10 @@
+streamlit
+langchain
+langchain-community
+nucliadb_sdk
+torch
+sentence_transformers
+llama-cpp-python
+chromadb
+langchain_openai
+pytest
