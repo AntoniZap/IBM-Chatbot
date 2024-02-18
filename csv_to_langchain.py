@@ -1,7 +1,9 @@
 # Document loading and the linke
 import os
-from langchain_community.document_loaders.csv_loader import CSVLoader
 import csv
+from typing import Dict, List, Optional
+from langchain.document_loaders.base import BaseLoader
+from langchain.docstore.document import Document
 
 class csv_to_langchain:
 
@@ -39,16 +41,49 @@ class csv_to_langchain:
 
         return output_filename
 
-
-    def amazon_reviews(self):
-        csvfile = self.add_unique_identifier() 
+# Loads a CSV File into a list of documents
+# Each document represents one row of the CSV file. Every row is converted into a
+# key/value pair and outputted to a new line in the document's page_content.
+class CSVLoader(BaseLoader):
+    def __init__(
+        self,
+        file_path: csv_to_langchain.add_unique_identifier,
+        source_column: Optional[str] = None,
+        metadata_columns: Optional[List[str]] = None,
+        csv_args: Optional[Dict] = None,
+        encoding: Optional[str] = None,
+    ):
+        self.file_path = file_path
+        self.source_column = source_column
+        self.encoding = encoding
+        self.csv_args = csv_args or {}
+        self.metadata_columns = metadata_columns
         
-        loader = CSVLoader(file_path='Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv', source_column='reviews.text', encoding='8859')
-
-        amazonReviewData = loader.load()
-
-        return amazonReviewData
-    
+    def load(self) -> List[Document]:
+        # Load data into document objects
+        docs = []
+        with open(self.file_path, newline="", encoding=self.encoding) as csvfile:
+            csv_reader = csv.DictReader(csvfile, **self.csv_args)
+            for i, row in enumerate(csv_reader):
+                content = "\n".join(f"{k.strip()}: {v.strip()}" for k, v in row.items())
+                try:
+                    source = (
+                        row[self.source_column]
+                        if self.source_column is not None
+                        else self.file_path
+                    )
+                except KeyError:
+                    raise ValueError(
+                        f"Source column '{self.source_column}' not found in CSV file."
+                    )
+                metadata = {"source": source, "row": i}
+                if self.metadata_columns:
+                    for k, v in row.items():
+                        if k in self.metadata_columns:
+                            metadata[k] = v
+                doc = Document(page_content=content, metadata=metadata)
+                docs.append(doc)
+        return docs
 
 
 
