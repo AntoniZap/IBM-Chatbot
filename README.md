@@ -46,7 +46,7 @@ If you are using LLaMa set the `LLM` environment variable to `LLAMA` and make su
 If you are using chatgpt, make sure you set the `LLM` environment variable to `CHATGPT` and set `OPENAI_API_KEY` to your OpenAI API key.
 If you are using AI21 llm, make sure you set the `LLM` environment variable to `AI21` and set `AI21_API_KEY` to your AI21 API key.
 
-## Running
+## Running the Backend
 
 ```
 . .env.template (no longer necessary)
@@ -54,4 +54,18 @@ streamlit run ChatbotConcept.py
 
 Please run the commands using bash, rather than powershell as it might not work using powershell (windows devices).
 
+```
+
+## Running the Frontend
+
+Navigate to the `front-end` folder and setup prerequisites via:
+
+```
+npm install`
+```
+
+You can then run the frontend using the command.
+
+```
+npm run start
 ```
