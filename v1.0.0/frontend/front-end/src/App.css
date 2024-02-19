@@ -24,6 +24,12 @@
   color: white;
 }
 
+/* App.css */
+.app-gradient {
+  background: linear-gradient(to right, #4c669f, #3b5998, #192f6a);
+  color: white; /* Ensure text within the gradient background is white */
+}
+
 .App-link {
   color: #61dafb;
 }
