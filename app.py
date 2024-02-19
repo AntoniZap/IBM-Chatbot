@@ -107,7 +107,7 @@ def get_llm():
     llm=data.get('llm')
     print(llm)
     os.environ['LLM'] = llm
-    llm = get_llm()
+    # llm = get_llm()
     return jsonify(200)
 
 if __name__ == "__main__":
