@@ -47,7 +47,7 @@ class csv_to_langchain:
 class CSVLoader(BaseLoader):
     def __init__(
         self,
-        file_path: csv_to_langchain.add_unique_identifier,
+        file_path: str,
         source_column: Optional[str] = None,
         metadata_columns: Optional[List[str]] = None,
         csv_args: Optional[Dict] = None,
@@ -62,7 +62,8 @@ class CSVLoader(BaseLoader):
     def load(self) -> List[Document]:
         # Load data into document objects
         docs = []
-        with open(self.file_path, newline="", encoding=self.encoding) as csvfile:
+        #self.file_path = csv_to_langchain.add_unique_identifier
+        with open(self.file_path, newline="", encoding="utf8") as csvfile:
             csv_reader = csv.DictReader(csvfile, **self.csv_args)
             for i, row in enumerate(csv_reader):
                 content = "\n".join(f"{k.strip()}: {v.strip()}" for k, v in row.items())
@@ -85,7 +86,4 @@ class CSVLoader(BaseLoader):
                 docs.append(doc)
         return docs
 
-
-
-
-    
+        
