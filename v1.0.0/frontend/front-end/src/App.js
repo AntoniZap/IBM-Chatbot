@@ -37,7 +37,7 @@ function App() {
                 } />
                 <Route path="/insert-document" element={<InsertDocument />} />
                 <Route path="/chat-with-me" element={<ChatWithMe />} />
-                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/about-us" element={<AboutMe />} />
               </Routes>
             </main>
           </div>
@@ -46,5 +46,20 @@ function App() {
     </Router>
   );
 }
+function HorizontalGradient() {
+  return (
+    <LinearGradient
+      colors={['#4c669f', '#3b5998', '#192f6a']}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 0}}
+      style={{flex: 1}}
+    >
+      {/* Your content goes here */}
+    </LinearGradient>
+  );
+}
 
-export default App;
+export default App; HorizontalGradient;
+
+
+
