@@ -11,12 +11,20 @@ function ChatWithMe() {
     setMessage(event.target.value);
   };
 
-  // const handleOptionChange = (event) => {
-  //   // Placeholder function for handling option changes
-  // };
+  const handleOptionChange = (event) => {
+    const llm = event.target.value;
+    
+    axios.post('/llm', { llm: llm })
+        .then(response => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error('Error with LLM request:', error);
+        });
+  };
 
   const handleSendMessage = async () => {
-    setChatHistory([...chatHistory, message]);
+    setChatHistory([...chatHistory, "You: " + message]);
     setMessage('');
     axios.post('/message', {message: message})
       .then(response => {
@@ -26,7 +34,6 @@ function ChatWithMe() {
         console.error('Error fetching data:', error);
       });
   };
-
   return (
     <div>
       <div>
@@ -34,10 +41,10 @@ function ChatWithMe() {
           <p key={index}>{msg}</p>
         ))}
       </div>
-      <select /*onChange={handleOptionChange}*/>
-        <option> ModelOption 1</option>
-        <option>Model Option 2</option>
-        <option>Model Option 3</option>
+      <select onChange={handleOptionChange}>
+        <option>ChatGPT</option>
+        <option>AI21</option>
+        <option>Other LLM</option>
       </select>
       <input type="text" value={message} onChange={handleInputChange} />
       <button onClick={handleSendMessage}>Send</button>

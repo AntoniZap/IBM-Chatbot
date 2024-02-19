@@ -101,7 +101,14 @@ def get_data():
 # def send_response(answer):
 #     print(answer)
     
-    
+@app.route('/llm', methods=['POST'])
+def get_llm():
+    data = request.json
+    llm=data.get('llm')
+    print(llm)
+    os.environ['LLM'] = llm
+    llm = get_llm()
+    return jsonify(200)
 
 if __name__ == "__main__":
     app.run(port=5000)
