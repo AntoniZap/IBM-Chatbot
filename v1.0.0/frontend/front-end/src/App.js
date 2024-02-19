@@ -19,7 +19,7 @@ function App() {
                   <Link className="nav-link" to="/">Home</Link>
                   <Link className="nav-link" to="/insert-document">Insert Document</Link>
                   <Link className="nav-link" to="/chat-with-me">Chat With Me</Link>
-                  <Link className="nav-link" to="/about-us">About Us</Link>
+                  <Link className="nav-link" to="/about-us">About Me</Link>
                 </nav>
               </div>
             </header>
@@ -37,7 +37,7 @@ function App() {
                 } />
                 <Route path="/insert-document" element={<InsertDocument />} />
                 <Route path="/chat-with-me" element={<ChatWithMe />} />
-                <Route path="/about-us" element={<AboutMe />} />
+                <Route path="/about-us" element={<AboutUs />} />
               </Routes>
             </main>
           </div>
@@ -46,20 +46,20 @@ function App() {
     </Router>
   );
 }
-function HorizontalGradient() {
-  return (
-    <LinearGradient
-      colors={['#4c669f', '#3b5998', '#192f6a']}
-      start={{x: 0, y: 0}}
-      end={{x: 1, y: 0}}
-      style={{flex: 1}}
-    >
-      {/* Your content goes here */}
-    </LinearGradient>
-  );
-}
+// function HorizontalGradient() {
+//   return (
+//     <LinearGradient
+//       colors={['#4c669f', '#3b5998', '#192f6a']}
+//       start={{x: 0, y: 0}}
+//       end={{x: 1, y: 0}}
+//       style={{flex: 1}}
+//     >
+//       {/* Your content goes here */}
+//     </LinearGradient>
+//   );
+// }
 
-export default App; HorizontalGradient;
+export default App; //HorizontalGradient;
 
 
 
