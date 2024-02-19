@@ -1,7 +1,7 @@
 import os
 
 if os.environ.get("LLM") is None:
-  os.environ['LLM'] = 'AI21'
+  os.environ['LLM'] = 'CHATGPT'
 LLM = os.getenv("LLM")
 
 if os.environ.get("LLAMA_MODEL_PATH") is None:
@@ -9,10 +9,10 @@ if os.environ.get("LLAMA_MODEL_PATH") is None:
 LLAMA_MODEL_PATH = os.getenv("LLAMA_MODEL_PATH")
 
 if os.environ.get("OPENAI_API_KEY") is None:
-  os.environ['OPENAI_API_KEY'] = ''
+  os.environ['OPENAI_API_KEY'] = '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'
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 if os.environ.get("AI21_API_KEY") is None:
-  os.environ['AI21_API_KEY'] = ''
+  os.environ['AI21_API_KEY'] = 'vPmvgnnmcypF5a43OOdxl8PTVevdPt7d'
 AI21_API_KEY = os.getenv("AI21_API_KEY")
 
