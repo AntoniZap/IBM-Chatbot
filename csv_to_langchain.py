@@ -62,11 +62,13 @@ class CSVLoader(BaseLoader):
     def load(self) -> List[Document]:
         # Load data into document objects
         docs = []
-        #self.file_path = csv_to_langchain.add_unique_identifier
         with open(self.file_path, newline="", encoding="utf8") as csvfile:
             csv_reader = csv.DictReader(csvfile, **self.csv_args)
             for i, row in enumerate(csv_reader):
-                content = "\n".join(f"{k.strip()}: {v.strip()}" for k, v in row.items())
+                content = ""
+                for k, v in row.items():
+                    if((k == "reviews.text") or (k == "name")):
+                        content = content + "".join(f"{k.strip()}: {v.strip()}\n")
                 try:
                     source = (
                         row[self.source_column]
@@ -85,5 +87,3 @@ class CSVLoader(BaseLoader):
                 doc = Document(page_content=content, metadata=metadata)
                 docs.append(doc)
         return docs
-
-        
