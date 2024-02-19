@@ -9,10 +9,10 @@ if os.environ.get("LLAMA_MODEL_PATH") is None:
 LLAMA_MODEL_PATH = os.getenv("LLAMA_MODEL_PATH")
 
 if os.environ.get("OPENAI_API_KEY") is None:
-  os.environ['OPENAI_API_KEY'] = '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'
+  os.environ['OPENAI_API_KEY'] = ''
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 if os.environ.get("AI21_API_KEY") is None:
-  os.environ['AI21_API_KEY'] = 'JYIIbUMqeZgOkABxGWTGAiqkpTEeuxrP'
+  os.environ['AI21_API_KEY'] = ''
 AI21_API_KEY = os.getenv("AI21_API_KEY")
 
