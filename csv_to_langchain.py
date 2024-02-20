@@ -41,13 +41,17 @@ class csv_to_langchain:
 
         return output_filename
 
+    def get_csv(self):
+      csvfile = self.add_unique_identifier()
+      return csvfile  
+
 # Loads a CSV File into a list of documents
 # Each document represents one row of the CSV file. Every row is converted into a
 # key/value pair and outputted to a new line in the document's page_content.
 class CSVLoader(BaseLoader):
     def __init__(
         self,
-        file_path: str,
+        file_path: csv_to_langchain("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products_May19.csv").get_csv(),
         source_column: Optional[str] = None,
         metadata_columns: Optional[List[str]] = None,
         csv_args: Optional[Dict] = None,
