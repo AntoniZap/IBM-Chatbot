@@ -1,30 +1,28 @@
-// App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import InsertDocument from './components/InsertDocument';
 import ChatWithMe from './components/ChatWithMe';
 import AboutUs from './components/AboutUs';
 import 'bootstrap/dist/css/bootstrap.css';
-import './App.css'; // Ensure this CSS file is correctly linked
+import './App.css';
 
 function App() {
   return (
     <Router>
-      <div className="App app-diagonal-gradient"> {/* Apply the gradient background */}
+      {/* Header with the navigation links */}
+      <header className="App-header">
+        <nav className="nav nav-masthead justify-content-center">
+          <Link className="nav-link" to="/">Home</Link>
+          <Link className="nav-link" to="/insert-document">Insert Document</Link>
+          <Link className="nav-link" to="/chat-with-me">Chat With Me</Link>
+          <Link className="nav-link" to="/about-us">About Us</Link>
+        </nav>
+      </header>
+      
+      {/* Main content area with the gradient background */}
+      <div className="app-diagonal-gradient">
         <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
           <div className="cover-container">
-            <header className="masthead mb-auto">
-              <div className="inner">
-                <h3 className="masthead-brand">Group 21 AI Chatbot</h3>
-                <nav className="nav nav-masthead justify-content-center">
-                  <Link className="nav-link" to="/">Home</Link>
-                  <Link className="nav-link" to="/insert-document">Insert Document</Link>
-                  <Link className="nav-link" to="/chat-with-me">Chat With Me</Link>
-                  <Link className="nav-link" to="/about-us">About Us</Link>
-                </nav>
-              </div>
-            </header>
-
             <main role="main" className="inner cover">
               <Routes>
                 <Route path="/" element={

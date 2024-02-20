@@ -1,3 +1,4 @@
+/* App.css */
 .App {
   text-align: center;
 }
@@ -13,23 +14,37 @@
   }
 }
 
+/* Updated .App-header for a white background and horizontal layout */
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  background-color: #fff; /* Set the header background to white */
+  padding: 1rem; /* Add some padding */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: Adds a shadow for depth */
+  position: sticky; /* Sticky position at the top */
+  top: 0; /* Stick to the top */
+  z-index: 1000; /* Make sure it's above other content */
+  display: flex; /* Use flexbox for layout */
+  justify-content: center; /* Center children horizontally */
+  align-items: center; /* Align children vertically */
+  min-height: initial; /* Override the previous 100vh */
+  width: 100%; /* Ensure the header is full width */
+  color: #333; /* Set a darker color for text for better contrast against white */
 }
 
-/* App.css */
+/* Style for the navigation links */
+.nav-link {
+  color: #333; /* Change link color for better contrast against white */
+  margin: 0 1rem; /* Spacing between links */
+  text-decoration: none; /* Remove underline from links */
+  font-weight: bold; /* Make the font bold */
+  padding: 0.5rem 1rem; /* Padding for larger click area */
+  display: inline-block; /* Treat the links as inline-block elements */
+}
+
+
 .app-diagonal-gradient {
   background: linear-gradient(135deg, #f1c1f6, rgb(241, 201, 190), #f7e6c3);
-  color: white; /* Ensure text within the gradient background is white */
-}
-
+  color: white; 
+} 
 
 .App-link {
   color: #61dafb;
@@ -44,8 +59,7 @@
   }
 }
 
-/* Add this to your App.css file */
-
+/* Profile icon, name, role, and about styles remain unchanged */
 .App .member .profile-icon {
   width: 15px; /* Adjust as needed */
   height: 15px; /* Adjust as needed */
