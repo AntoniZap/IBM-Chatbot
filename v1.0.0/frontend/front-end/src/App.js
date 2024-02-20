@@ -10,7 +10,7 @@ import './App.css'; // Ensure this CSS file is correctly linked
 function App() {
   return (
     <Router>
-      <div className="App app-gradient"> {/* Apply the gradient background */}
+      <div className="App app-diagonal-gradient"> {/* Apply the gradient background */}
         <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
           <div className="cover-container">
             <header className="masthead mb-auto">
