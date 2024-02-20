@@ -51,7 +51,7 @@ class csv_to_langchain:
 class CSVLoader(BaseLoader):
     def __init__(
         self,
-        file_path: csv_to_langchain("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products_May19.csv").get_csv(),
+        file_path = str,
         source_column: Optional[str] = None,
         metadata_columns: Optional[List[str]] = None,
         csv_args: Optional[Dict] = None,
