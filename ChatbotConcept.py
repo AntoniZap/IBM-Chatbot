@@ -19,7 +19,7 @@ from langchain.memory import ChatMessageHistory
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Our own stuff
-from normalise import Datafiniti
+from csv_to_langchain import CSVLoader
 from local import resolve
 
 # streamlit
@@ -27,7 +27,7 @@ import streamlit as st
 
 @st.cache_resource()
 def get_db():
-    documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
+    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
     split_documents = text_splitter.split_documents(documents)
     model = SentenceTransformer("all-MiniLM-L6-v2")
