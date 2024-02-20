@@ -26,7 +26,7 @@
 
 /* App.css */
 .app-diagonal-gradient {
-  background: linear-gradient(45deg, #f1c1f6, rgb(241, 201, 190), #f7e6c3);
+  background: linear-gradient(135deg, #f1c1f6, rgb(241, 201, 190), #f7e6c3);
   color: white; /* Ensure text within the gradient background is white */
 }
 
