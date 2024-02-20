@@ -5,21 +5,12 @@ import InsertDocument from './components/InsertDocument';
 import ChatWithMe from './components/ChatWithMe';
 import AboutUs from './components/AboutUs';
 import 'bootstrap/dist/css/bootstrap.css';
-import './App.css'; // Make sure your CSS is imported
+import './App.css'; // Ensure this CSS file is correctly linked
 
 function App() {
-  // Define the gradient as an inline style (for demonstration, not applied)
-  /*
-  const gradientStyle = {
-    background: 'linear-gradient(to right, #4c669f, #3b5998, #192f6a)',
-    color: 'white',
-  };
-  */
-
   return (
     <Router>
-      {/* Apply the CSS class for the gradient. To use inline style instead, replace `className="App app-gradient"` with `style={gradientStyle}` */}
-      <div className="App app-gradient">
+      <div className="App app-gradient"> {/* Apply the gradient background */}
         <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
           <div className="cover-container">
             <header className="masthead mb-auto">
