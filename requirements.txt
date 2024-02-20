@@ -8,3 +8,4 @@ llama-cpp-python
 chromadb
 langchain_openai
 pytest
+flask
