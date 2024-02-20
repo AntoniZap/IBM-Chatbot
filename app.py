@@ -34,28 +34,55 @@ app = Flask(__name__)
 CORS(app)
 db = get_db()
 # if os.getenv('LLM') != "TESTING":
-llm = get_llm()
-# else:
-#     print("UI test mode, not testing LLM.")
-#     sys.exit(0)
-memory = get_memory()
-options = get_options()
 
-# prompt template
-system_prompt = resolve(options["language"], "system_prompt")
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", system_prompt + "\n{context}\n----------"),
-        MessagesPlaceholder(variable_name="messages")
-    ]
-)
+def setup_env_var():
+    setup(os.getenv('LLM'))
+    
+def setup(llm_choice):
+    global llm
+    if llm_choice == "LLAMA":
+        from langchain_community.llms import LlamaCpp
+        from langchain.callbacks.manager import CallbackManager
+        from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+        llm = LlamaCpp(
+            model_path= os.getenv('LLAMA_MODEL_PATH'),
+            callback_manager = callback_manager,
+            verbose = True,
+            n_ctx=1024,
+        )
+    elif llm_choice == "ChatGPT":
+        from langchain_openai import ChatOpenAI
+        llm = ChatOpenAI(temperature = 0.6)
+    elif llm_choice == "AI21":
+       from langchain.llms import AI21
+       llm = AI21(temperature=0)
+    # else:
+    #     print("UI test mode, not testing LLM.")
+    #     sys.exit(0)
+    global memory
+    memory = get_memory()
+    global options
+    options = get_options()
 
-retriever = db.as_retriever(k=1)
-# if os.getenv('LLM') != "TESTING":
-document_chain = create_stuff_documents_chain(llm, prompt)
-retrieval_chain = RunnablePassthrough \
-    .assign(context=query_chain(retriever)) \
-    .assign(answer=document_chain)
+    # prompt template
+    system_prompt = resolve(options["language"], "system_prompt")
+    prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", system_prompt + "\n{context}\n----------"),
+            MessagesPlaceholder(variable_name="messages")
+        ]
+    )
+
+    retriever = db.as_retriever(k=1)
+    # if os.getenv('LLM') != "TESTING":
+    global retrieval_chain
+    document_chain = create_stuff_documents_chain(llm, prompt)
+    retrieval_chain = RunnablePassthrough \
+        .assign(context=query_chain(retriever)) \
+        .assign(answer=document_chain)
+    
+    return llm
 
 # for message in memory.messages:
 #     if type(message) is HumanMessage:
@@ -65,7 +92,7 @@ retrieval_chain = RunnablePassthrough \
 #         with st.chat_message(resolve(options["language"], "assistant_role_label")):
             
 
-
+setup_env_var()
 
 # print("QUESTION IS: ", question)
 
@@ -104,11 +131,12 @@ def get_data():
 @app.route('/llm', methods=['POST'])
 def get_llm():
     data = request.json
-    llm=data.get('llm')
-    print(llm)
-    os.environ['LLM'] = llm
-    # llm = get_llm()
+    llm_choice=data.get('llm')
+    setup(llm_choice)
     return jsonify(200)
+    
+
+    
 
 if __name__ == "__main__":
     app.run(port=5000)

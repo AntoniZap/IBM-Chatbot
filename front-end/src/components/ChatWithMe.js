@@ -44,7 +44,7 @@ function ChatWithMe() {
       <select onChange={handleOptionChange}>
         <option>ChatGPT</option>
         <option>AI21</option>
-        <option>Other LLM</option>
+        <option>LLAMA</option>
       </select>
       <input type="text" value={message} onChange={handleInputChange} />
       <button onClick={handleSendMessage}>Send</button>
