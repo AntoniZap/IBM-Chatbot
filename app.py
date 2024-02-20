@@ -33,7 +33,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 db = get_db()
-# if os.getenv('LLM') != "TESTING":
 
 def setup_env_var():
     setup(os.getenv('LLM'))
@@ -57,9 +56,6 @@ def setup(llm_choice):
     elif llm_choice == "AI21":
        from langchain.llms import AI21
        llm = AI21(temperature=0)
-    # else:
-    #     print("UI test mode, not testing LLM.")
-    #     sys.exit(0)
     global memory
     memory = get_memory()
     global options
@@ -75,26 +71,15 @@ def setup(llm_choice):
     )
 
     retriever = db.as_retriever(k=1)
-    # if os.getenv('LLM') != "TESTING":
     global retrieval_chain
     document_chain = create_stuff_documents_chain(llm, prompt)
     retrieval_chain = RunnablePassthrough \
         .assign(context=query_chain(retriever)) \
         .assign(answer=document_chain)
     
-    return llm
-
-# for message in memory.messages:
-#     if type(message) is HumanMessage:
-#         with st.chat_message(resolve(options["language"], "user_role_label")):
-            
-#     else:
-#         with st.chat_message(resolve(options["language"], "assistant_role_label")):
-            
+    return llm           
 
 setup_env_var()
-
-# print("QUESTION IS: ", question)
 
 @app.route('/message', methods=['POST'])
 def get_data():
@@ -103,7 +88,6 @@ def get_data():
     print(message)
     memory.add_user_message(message)
     payload = { "messages": memory.messages }
-    
     
     full = None
 
@@ -123,10 +107,6 @@ def get_data():
         else:
             memory.add_ai_message(full["answer"])
     return jsonify(full["answer"])
-
-
-# def send_response(answer):
-#     print(answer)
     
 @app.route('/llm', methods=['POST'])
 def get_llm():
@@ -135,8 +115,5 @@ def get_llm():
     setup(llm_choice)
     return jsonify(200)
     
-
-    
-
 if __name__ == "__main__":
     app.run(port=5000)
