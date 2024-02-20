@@ -2,7 +2,6 @@ import os
 import os.path
 import sys
 
-
 # Document loading and the link
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
@@ -31,8 +30,10 @@ import streamlit as st
 def get_db():
     if  os.getenv('LLM') == "TESTING":
         documents = Datafiniti("Test_Dataset.csv").load()[:1]
+
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
         split_documents = text_splitter.split_documents(documents)
+
     else:
         documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
