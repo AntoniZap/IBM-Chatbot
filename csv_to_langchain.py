@@ -65,6 +65,7 @@ class CSVLoader(BaseLoader):
         with open(self.file_path, newline="", encoding="utf8") as csvfile:
             csv_reader = csv.DictReader(csvfile, **self.csv_args)
             for i, row in enumerate(csv_reader):
+                # content = "\n".join(f"{k.strip()}: {v.strip()}" for k, v in row.items())
                 content = ""
                 for k, v in row.items():
                     if((k == "reviews.text") or (k == "name")):
@@ -87,3 +88,9 @@ class CSVLoader(BaseLoader):
                 doc = Document(page_content=content, metadata=metadata)
                 docs.append(doc)
         return docs
+    
+class printing:
+    myList = ["names", "reviews.text", "reviews.doRecommend", "reviews.title"]
+    docList = CSVLoader('Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv', None, myList).load()
+    for x in range(2):
+        print(docList[x].metadata)
