@@ -29,7 +29,7 @@ class Datafiniti:
         'reviews.numHelpful', # needs context
         'reviews.rating', # needs context / bound for LLM (have prompt to provide this later),
         'id' # irrelevant
-    ]
+    ]# C:\Users\Lorca\anaconda3\Lib\site-packages\langchain_community\document_loaders\csv_loader.py"
     
     def __init__(self, path):
         self.path = path
