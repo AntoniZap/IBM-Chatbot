@@ -27,25 +27,40 @@ import config
 # streamlit
 import streamlit as st
 
-def main():
-    db = get_db()
-    if os.getenv('LLM') != "TESTING":
-        llm = get_llm()
-    else:
-        print("UI test mode, not testing LLM.")
-        sys.exit(0)
+# Flask
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+app = Flask(__name__)
+CORS(app)
+db = get_db()
+
+def setup_env_var():
+    setup(os.getenv('LLM'))
+    
+def setup(llm_choice):
+    global llm
+    if llm_choice == "LLAMA":
+        from langchain_community.llms import LlamaCpp
+        from langchain.callbacks.manager import CallbackManager
+        from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+        llm = LlamaCpp(
+            model_path= os.getenv('LLAMA_MODEL_PATH'),
+            callback_manager = callback_manager,
+            verbose = True,
+            n_ctx=1024,
+        )
+    elif llm_choice == "ChatGPT":
+        from langchain_openai import ChatOpenAI
+        llm = ChatOpenAI(temperature = 0.6)
+    elif llm_choice == "AI21":
+       from langchain.llms import AI21
+       llm = AI21(temperature=0)
+    global memory
     memory = get_memory()
+    global options
     options = get_options()
-    
-    language = st.sidebar.selectbox(resolve(options["language"], "select_language"), ("English", "Gaeilge"))
-    llm_selection = st.sidebar.selectbox(resolve(options["language"], "select_llm"), ("LLaMa", "OpenAI", "Google", "Meta", "IBM"))
-    question = st.chat_input(resolve(options["language"], "prompt_placeholder"))
-    
-    if language:
-        options["language"] = language
-    
-    st.title(resolve(options["language"], "title"))
-    
+
     # prompt template
     system_prompt = resolve(options["language"], "system_prompt")
     prompt = ChatPromptTemplate.from_messages(
@@ -54,51 +69,35 @@ def main():
             MessagesPlaceholder(variable_name="messages")
         ]
     )
-    
+
     retriever = db.as_retriever(k=1)
-    if os.getenv('LLM') != "TESTING":
-        document_chain = create_stuff_documents_chain(llm, prompt)
-        retrieval_chain = RunnablePassthrough \
-            .assign(context=query_chain(retriever)) \
-            .assign(answer=document_chain)
+    global retrieval_chain
+    document_chain = create_stuff_documents_chain(llm, prompt)
+    retrieval_chain = RunnablePassthrough \
+        .assign(context=query_chain(retriever)) \
+        .assign(answer=document_chain)
     
-    for message in memory.messages:
-        if type(message) is HumanMessage:
-            with st.chat_message(resolve(options["language"], "user_role_label")):
-                st.markdown(message.content)
-        else:
-            with st.chat_message(resolve(options["language"], "assistant_role_label")):
-                st.markdown(message.content)
-    
-    if question is None or question == "":
-        print("No question. Exiting")
-        exit()
-    
-    memory.add_user_message(question)
-    
-    # print("QUESTION IS: ", question)
-    with st.chat_message(resolve(options["language"], "user_role_label")):
-        st.markdown(question)
-    
+    return llm           
+
+setup_env_var()
+
+@app.route('/message', methods=['POST'])
+def get_data():
+    data = request.json
+    message=data.get('message')
+    print(message)
+    memory.add_user_message(message)
     payload = { "messages": memory.messages }
-    with st.chat_message(resolve(options["language"], "assistant_role_label")):
-        element = st.empty()
-    
-    st.subheader(resolve(options["language"], "sources"))
-    context = st.empty()
     
     full = None
-    
+
     with st.spinner(resolve(options["language"], "loading")):
         for item in retrieval_chain.stream(payload):
             if full is None:
                 full = item
             else:
                 full += item
-            if "answer" in full:
-                element.write(full["answer"])
-            if "context" in full:
-                context.write([doc.page_content for doc in full["context"]])
+            
             print(item)
         st.write("\n")
 
@@ -107,6 +106,14 @@ def main():
             memory.add_ai_message(full)
         else:
             memory.add_ai_message(full["answer"])
-
+    return jsonify(full["answer"])
+    
+@app.route('/llm', methods=['POST'])
+def get_llm():
+    data = request.json
+    llm_choice=data.get('llm')
+    setup(llm_choice)
+    return jsonify(200)
+    
 if __name__ == "__main__":
-    main()
+    app.run(port=5000)

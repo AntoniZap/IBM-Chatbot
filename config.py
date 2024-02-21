@@ -1,7 +1,7 @@
 import os
 
 if os.environ.get("LLM") is None:
-  os.environ['LLM'] = 'AI21'
+  os.environ['LLM'] = 'CHATGPT'
 LLM = os.getenv("LLM")
 
 if os.environ.get("LLAMA_MODEL_PATH") is None:

@@ -1,0 +1,24 @@
+.member-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 20px;
+    overflow: auto;
+  }
+  
+  .profile-icon {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .member-name{
+    font-size: 30px;
+  }
+
+  .member-role {
+    font-size: 20px;
+  }
+  
+  .member-about {
+    font-size: 14px;
+  }
+  

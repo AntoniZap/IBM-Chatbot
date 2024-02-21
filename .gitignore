@@ -1,5 +1,6 @@
 __pycache__/
 .chroma_db/
 env/
-.env.template
+.Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv.icloud
 Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv
+config.py
