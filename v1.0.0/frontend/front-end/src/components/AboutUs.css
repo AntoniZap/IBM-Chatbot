@@ -1,8 +1,9 @@
 /* AboutUs.css */
 .about-us-page {
   background-color: #ffcccc; /* Light shade of red */
-  min-height: 100vh; /* Ensure it covers at least the full height of the viewport */
+  min-height: calc(100vh - 40px); /* Adjusting for 20px padding on top and bottom */
   padding: 20px; /* Adjust as needed */
+  box-sizing: border-box; /* Ensures padding is included in the element's total height/width */
 }
 
 .member-container {
