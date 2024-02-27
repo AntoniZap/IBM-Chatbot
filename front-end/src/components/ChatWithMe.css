@@ -10,12 +10,19 @@
 .user {
   align-self: flex-end;
   background-color: #E6E6E6; /* Add background color for user message */
+  color: black
 }
 
 .bot {
   align-self: flex-start;
   flex-direction: row-reverse; /* switch message direction  */
   background-color: #CA6267; /* background color for the bot message */
+  color: #FFFFFF
+}
+.llama {
+  align-self: flex-start;
+  flex-direction: row-reverse; /* switch message direction  */
+  background-color: #ca626784; /* background color for the bot message */
   color: #FFFFFF
 }
 .message {
