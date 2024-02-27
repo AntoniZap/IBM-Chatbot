@@ -44,6 +44,18 @@
   background: linear-gradient(135deg, #FAFAFA, #F6CDCD, #F29F9F, #EE7272, #EA4444);
   color: white; 
 } 
+
+.container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.cover-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
 .cover-heading,
 .lead {
   margin-left: 0 !important; /* Override any existing margins */
