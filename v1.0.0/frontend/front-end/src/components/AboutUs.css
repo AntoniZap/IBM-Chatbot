@@ -4,10 +4,12 @@
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 20px;
   margin-top: 400px; /* Adjust this value to match the height of your sticky header */
-  padding: 20px; /* Optional: for some inner spacing */
+  padding: 0px; /* Optional: for some inner spacing */
   overflow: auto;
   justify-content: center; /* Center grid items horizontally */
   background-color: #ffcccc; /* Light shade of red */
+  width: 100%;
+
 }
 
 .member {
