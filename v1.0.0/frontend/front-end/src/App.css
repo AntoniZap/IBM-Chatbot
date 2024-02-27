@@ -7,7 +7,7 @@
   background: linear-gradient(135deg, #FAFAFA, #F6CDCD, #F29F9F, #EE7272, #EA4444, #E61717);
   color: white;
   /* Ensure it covers the full height of the viewport */
-  min-height: 100vh;
+  /*min-height: 100vh;*/
 }
 
 .App-logo {
