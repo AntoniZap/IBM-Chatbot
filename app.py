@@ -10,12 +10,19 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ChatMessageHistory
 
 # Our own stuff
 from csv_to_langchain import CSVLoader
 from local import resolve
+import config
 
+import functools
+from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
+
+@functools.cache
 def get_db():
     documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
@@ -36,100 +43,148 @@ def get_db():
         )
     return db
 
-def get_options():
-    global options
-    options = { "language" : "English" }
-    return options
-
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
 
+def setup_llama():
+    from langchain_community.llms import LlamaCpp
+    from langchain.callbacks.manager import CallbackManager
+    from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+    from llama_cpp import LlamaCache
+    callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+    llm = LlamaCpp(
+        model_path= os.getenv('LLAMA_MODEL_PATH'),
+        callback_manager = callback_manager,
+        verbose = True,
+        n_ctx=1024,
+    )
+    llm.client.set_cache(LlamaCache())
+    return llm
+
+def setup_chatgpt():
+    from langchain_openai import ChatOpenAI
+    llm = ChatOpenAI(temperature = 0.6)
+    return llm
+
+def setup_ai21():
+    from langchain.llms import AI21
+    llm = AI21(temperature=0)
+    return llm
+
+def set_llm(llm_choice):
+    global llm
+    llm = llm_choice
+
+def get_llm(llm_choice):
+    global llms
+    llm_choice = llm_choice.lower()
+    try:
+        llm = llms[llm_choice]
+    except KeyError:
+        if llm_choice == "llama":
+            setup = setup_llama
+        elif llm_choice == "ai21":
+            setup = setup_ai21
+        elif llm_choice == "chatgpt":
+            setup = setup_chatgpt
+        else:
+            raise KeyError()
+        llm = setup()
+        system_prompt = resolve(options["language"], "system_prompt")
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", f"{system_prompt}\n\\{{context}}\n----------"),
+                MessagesPlaceholder(variable_name="messages")
+            ]
+        )
+        retriever = get_db().as_retriever(k=1)
+        document_chain = create_stuff_documents_chain(llm, prompt)
+        chain = RunnablePassthrough \
+            .assign(context=query_chain(retriever)) \
+            .assign(answer=document_chain)
+        llms[llm_choice] = chain
+    return llms[llm_choice]
 
 # Flask
+llms = {}
+memory = ChatMessageHistory()
+options = { "language" : "English" }
+
+llm = config.LLM or 'ChatGPT'
+get_llm(config.LLM)
+
+def _n(x): next(x)
+
+def _get_data(messages, llm_choices):
+    jobs = []
+    pool = ThreadPoolExecutor(2)
+    for llm_choice in llm_choices:
+        chain = get_llm(llm_choice)
+        job = pool.submit(
+            infer,
+            messages,
+            chain,
+            lambda part, whole: print(f"got message from `{llm_choice}`: {part}")
+            # None
+        )
+        jobs.append((llm_choice, job))
+
+    answers = []
+        
+    for llm, job in jobs:
+        answer = job.result()
+        answers.append({
+            "llm": llm,
+            "answer": answer["answer"]
+        })
+        
+    return answers
+
+def infer(messages, chain, cb):
+    payload = { "messages": messages }
+    full = None
+    for item in chain.stream(payload):
+        if full is None:
+            full = item
+        else:
+            full += item
+        if cb is not None:
+            cb(item, full)
+    return full
+
+# m = ChatMessageHistory()
+# m.add_message(HumanMessage(content="Was the kindle good"))
+# print(_get_data(m.messages, ["ai21"]))
+
+# exit()
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_socketio import SocketIO
 app = Flask(__name__)
+socketio = SocketIO(app)
 CORS(app)
-
-def setup_env_var():
-    setup(os.getenv('LLM', 'ChatGPT'))
-
-def setup(llm_choice):
-    global memory
-    memory = ChatMessageHistory()
-    global llm
-    if llm_choice == "LLAMA":
-        from langchain_community.llms import LlamaCpp
-        from langchain.callbacks.manager import CallbackManager
-        from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-        
-        llm = LlamaCpp(
-            model_path= os.getenv('LLAMA_MODEL_PATH'),
-            callback_manager = callback_manager,
-            verbose = True,
-            n_ctx=1024,
-        )
-    elif llm_choice == "ChatGPT":
-        from langchain_openai import ChatOpenAI
-        llm = ChatOpenAI(temperature = 0.6)
-    elif llm_choice == "AI21":
-       from langchain.llms import AI21
-       llm = AI21(temperature=0)
-    global options
-    options = get_options()
-
-    # prompt template
-    system_prompt = resolve(options["language"], "system_prompt")
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt + "\n{context}\n----------"),
-            MessagesPlaceholder(variable_name="messages")
-        ]
-    )
-    global db
-    db = get_db()
-    retriever = db.as_retriever(k=1)
-    global retrieval_chain
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    retrieval_chain = RunnablePassthrough \
-        .assign(context=query_chain(retriever)) \
-        .assign(answer=document_chain)
-    
-    return llm           
-
-setup_env_var()
 
 @app.route('/message', methods=['POST'])
 def get_data():
     data = request.json
     message = data.get('message')
-    print(message)
+    global llm
+    llm_choices = data.get('llms') or [llm]
+    global memory
     memory.add_user_message(message)
-    payload = { "messages": memory.messages }
+    return jsonify(_get_data(memory.messages, llm_choices))
     
-    full = None
 
-    for item in retrieval_chain.stream(payload):
-        if full is None:
-            full = item
-        else:
-            full += item
-        print(item)
-
-    if full is not None:
-        if type(full) is str:
-            memory.add_ai_message(full)
-        else:
-            memory.add_ai_message(full["answer"])
-    return jsonify(full["answer"])
-    
 @app.route('/llm', methods=['POST'])
-def get_llm():
-    data = request.json
-    llm_choice=data.get('llm')
-    setup(llm_choice)
+def _get_llm():
+    llm_choice = request.json.get('llm')
+    set_llm(llm_choice)
     return jsonify(200)
-    
+
+@socketio.on('/socket')
+def succ():
+    pass
+
 if __name__ == "__main__":
     app.run(port=5000)

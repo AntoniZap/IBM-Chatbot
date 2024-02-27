@@ -31,7 +31,7 @@ function ChatWithMe() {
     setMessage('');
     axios.post('/message', {message: message})
       .then(response => {
-        setChatHistory([...chatHistory, { sender: 'user', message: message }, { sender: 'bot', message: response.data }]);
+        setChatHistory([...chatHistory, { sender: 'user', message: message }, { sender: 'bot', message: response.data[0].answer }]);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
