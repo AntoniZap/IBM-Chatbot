@@ -1,13 +1,10 @@
-/* App.css */
-
 /* Apply the gradient background to the whole app */
 .App {
   text-align: center;
   /* Gradient background from white to various shades of red */
   background: linear-gradient(135deg, #FAFAFA, #F6CDCD, #F29F9F, #EE7272, #EA4444, #E61717);
   color: white;
-  /* Ensure it covers the full height of the viewport */
-  /*min-height: 100vh;*/
+  min-height: 100vh;
 }
 
 .App-logo {
@@ -32,8 +29,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: initial; /* Remove the 100vh to avoid taking the full screen height */
-  width: 100%; /* Full width */
   color: #333; /* Darker text for better contrast */
 }
 
