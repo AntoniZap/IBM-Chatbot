@@ -37,13 +37,14 @@ function ChatWithMe() {
         console.error('Error fetching data:', error);
       });
   };
+  
   return (
     <div>
       <div className="message-bubble">
         {chatHistory.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
             <text>{msg.message}</text>
-            <img src={msg.sender === 'user' ? User : Bot} alt={`${msg.sender} icon`} className="user-icon" />
+            <img src={msg.sender === 'user' ? User : Bot} alt={`${msg.sender} icon`} className="user-icon" /> 
           </div>
         ))}
       </div>

@@ -1,12 +1,14 @@
-.user-icon{
+/* icon size modification */
+.user-icon{  
   width: 50px;
   height: 50px;
 }
 
 .message-bubble {
   display: flex;
-  flex-direction: column;
+  flex-direction: column;       
 }
+
 .user {
   align-self: flex-end;
   background-color: #E6E6E6; /* Add background color for user message */
@@ -27,17 +29,17 @@
 }
 .message {
   display: flex;
-  width: fit-content;
-  max-width: 500px;
+  width: fit-content;           
+  max-width: 500px;             /* make sure each box is not too big*/
   margin-top: 8px;
   margin-bottom: 8px;
-  font-size: 15px;
-  padding: 10px; /* Add padding to each message */
-  border-radius: 10px; /* Add border radius for rounded corners */
+  font-size: 15px;              /* text size */
+  padding: 10px;                /* Add padding to each message */
+  border-radius: 10px;          /* rounded corners */
 }
 
 text{
-  text-align: justify; /* Center the text horizontally */
-  margin: auto; /* Center the text vertically */
+  text-align: justify;          /* Make the text aligned on each side */
+  margin: auto;                 /* Center the text vertically */
 }
   
