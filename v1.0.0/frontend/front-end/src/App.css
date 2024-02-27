@@ -2,17 +2,17 @@
 .App {
   text-align: center;
 }
-
 .App-logo {
-  height: 40vmin;
+  height: 8vmin; /* Adjust the size of the logo */
   pointer-events: none;
+  margin-right: 20 px; /* Add some space between the logo and the nav links */
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Remove or comment out the animation if not needed for the logo */
+/* @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+    animation: none; /* This disables the spinning animation */
+  
 
 /* Updated .App-header for a white background and horizontal layout */
 .App-header {
@@ -45,20 +45,9 @@
   color: white; 
 } 
 
-.container-fluid {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.cover-container {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100%;
-}
 
 .cover-heading,
 .lead {
-  margin-left: 0 !important; /* Override any existing margins */
   padding-left: 15px; /* Optional: Add some padding to ensure the text is not right against the screen edge */
   text-align: left; /* Aligns text to the left */
   color: black;
