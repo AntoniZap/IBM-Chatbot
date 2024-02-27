@@ -21,17 +21,15 @@ const teamMembers = [
 
 function AboutUs() {
   return (
-    <div className="about-us-page"> {/* New wrapper div */}
-      <div className="member-container">
-        {teamMembers.map((member) => (
-          <div key={member.name} className="member">
-            <img src={member.image} alt={member.name} className="profile-icon" />
-            <h2 className="member-name">{member.name}</h2>
-            <h3 className="member-role">{member.role}</h3>
-            <p className="member-about">{member.about}</p>
-          </div>
-        ))}
-      </div>
+    <div className="member-container">
+      {teamMembers.map((member) => (
+        <div key={member.name} className="member"> {/* Changed key to member.name for uniqueness */}
+          <img src={member.image} alt={member.name} className="profile-icon" />
+          <h2 className="member-name">{member.name}</h2>
+          <h3 className="member-role">{member.role}</h3>
+          <p className="member-about">{member.about}</p>
+        </div>
+      ))}
     </div>
   );
 }
