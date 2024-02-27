@@ -44,6 +44,11 @@
   background: linear-gradient(135deg, #FAFAFA, #F6CDCD, #F29F9F, #EE7272, #EA4444);
   color: white; 
 } 
+.cover-heading,
+.lead {
+  text-align: left; /* Aligns text to the left */
+  color: black; /* Keep your previous color change */
+}
 
 .App-link {
   color: #61dafb;
