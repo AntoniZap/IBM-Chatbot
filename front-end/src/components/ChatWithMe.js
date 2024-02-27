@@ -31,19 +31,21 @@ function ChatWithMe() {
     setMessage('');
     axios.post('/message', {message: message})
       .then(response => {
-        setChatHistory([...chatHistory, { sender: 'user', message: message }, { sender: 'bot', message: response.data }]);
+        // differentiate between the two reply types
+        setChatHistory([...chatHistory, { sender: 'user', message: message }, { sender: 'bot', message: response.data }]); 
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
   };
+  
   return (
     <div>
       <div className="message-bubble">
         {chatHistory.map((msg, index) => (
           <div key={index} className={`message ${msg.sender}`}>
             <text>{msg.message}</text>
-            <img src={msg.sender === 'user' ? User : Bot} alt={`${msg.sender} icon`} className="user-icon" />
+            <img src={msg.sender === 'user' ? User : Bot} alt={`${msg.sender} icon`} className="user-icon" /> 
           </div>
         ))}
       </div>
