@@ -21,6 +21,20 @@ import config
 import functools
 from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, Iterator, List, Optional, Union
+from dataclasses import dataclass, field
+from queue import Queue
+
+@dataclass
+class PendingInferenceComplete:
+    pass
+
+@dataclass
+class PendingResponseChoice:
+    answers: Dict[str, str]
+    """
+    A mapping from llm names → answers
+    """
 
 @functools.cache
 def get_db():
@@ -106,30 +120,43 @@ def get_llm(llm_choice):
     return llms[llm_choice]
 
 # Flask
+state = None
 llms = {}
+queue = Queue()
 memory = ChatMessageHistory()
 options = { "language" : "English" }
 
 llm = config.LLM or 'ChatGPT'
 get_llm(config.LLM)
 
-def _n(x): next(x)
-
 def _get_data(messages, llm_choices):
     jobs = []
     pool = ThreadPoolExecutor(2)
+    global socketio
     for llm_choice in llm_choices:
+        @dataclass
+        class Closure:
+            llm: str
+            def __call__(self, part, whole):
+                print(f"got message from `{self.llm}`: {part}")
+                socketio.emit("socket", {
+                    "llm": self.llm,
+                    "answer": whole.get("answer", "")
+                })
+                
         chain = get_llm(llm_choice)
+        print(f"Submitting task for `{llm_choice}`")
         job = pool.submit(
             infer,
             messages,
             chain,
-            lambda part, whole: print(f"got message from `{llm_choice}`: {part}")
+            Closure(llm_choice)
             # None
         )
         jobs.append((llm_choice, job))
 
     answers = []
+    # sources = [doc.page_content for doc in full[0]["context"]]
         
     for llm, job in jobs:
         answer = job.result()
@@ -137,10 +164,11 @@ def _get_data(messages, llm_choices):
             "llm": llm,
             "answer": answer["answer"]
         })
-        
+    
     return answers
 
 def infer(messages, chain, cb):
+    print("Starting inference for LLM")
     payload = { "messages": messages }
     full = None
     for item in chain.stream(payload):
@@ -152,39 +180,46 @@ def infer(messages, chain, cb):
             cb(item, full)
     return full
 
-# m = ChatMessageHistory()
-# m.add_message(HumanMessage(content="Was the kindle good"))
-# print(_get_data(m.messages, ["ai21"]))
-
-# exit()
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app)
 
 @app.route('/message', methods=['POST'])
 def get_data():
+    global state
+    if state is not None:
+        return jsonify(error="Already running inference"), 400
+    state = PendingInferenceComplete
     data = request.json
     message = data.get('message')
     global llm
     llm_choices = data.get('llms') or [llm]
-    global memory
+    global conversation
     memory.add_user_message(message)
-    return jsonify(_get_data(memory.messages, llm_choices))
-    
+    answers = _get_data(memory.messages, llm_choices)
+    state = PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers })
+    return jsonify(answers)
+
+@app.route('/selectAnswer', methods=['POST'])
+def select_response():
+    data = request.json
+    global state
+    if type(state) is not PendingResponseChoice:
+        return jsonify(400)
+    chosen_answer = data.get('llm')
+    global memory
+    memory.add_ai_message(state.answers[chosen_answer.lower()])
+    state = None
+    return jsonify(200)
 
 @app.route('/llm', methods=['POST'])
 def _get_llm():
     llm_choice = request.json.get('llm')
     set_llm(llm_choice)
     return jsonify(200)
-
-@socketio.on('/socket')
-def succ():
-    pass
 
 if __name__ == "__main__":
     app.run(port=5000)

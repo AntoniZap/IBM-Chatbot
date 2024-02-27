@@ -16,7 +16,8 @@
 .bot {
     flex-direction: row-reverse; /* switch message direction  */
     background-color: #CA6267; /* background color for the bot message */
-  }
+}
+
 .message {
     display: flex;
     align-items: center;
@@ -29,4 +30,44 @@
     border-radius: 10px; /* Add border radius for rounded corners */
   }
 
-  
+.llm-container input {
+    display: none;
+    user-select: none;
+}
+
+label:hover {
+    filter: brightness(2.0);
+}
+
+.llm-container:has(label:hover) {
+    background-color: lightgrey;
+}
+
+.llm-container:has(input:checked) {
+    background-color: #DAA;
+    border: 2px outset #DAA;
+}
+.llm-container-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.llm-container {
+    max-width: 450px;
+    border-radius: 10px;
+    background-color: buttonface;
+    border: 2px outset buttonface;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.loading {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
