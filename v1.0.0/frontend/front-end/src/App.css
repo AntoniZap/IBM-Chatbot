@@ -46,8 +46,11 @@
 } 
 .cover-heading,
 .lead {
+  margin-left: 0 !important; /* Override any existing margins */
+  padding-left: 15px; /* Optional: Add some padding to ensure the text is not right against the screen edge */
   text-align: left; /* Aligns text to the left */
-  color: black; /* Keep your previous color change */
+  color: black;
+  
 }
 
 .App-link {
