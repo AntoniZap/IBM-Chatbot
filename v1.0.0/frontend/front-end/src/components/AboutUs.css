@@ -1,13 +1,19 @@
 /* AboutUs.css */
+.about-us-page {
+  background-color: #ffcccc; /* Light shade of red */
+  min-height: 100vh; /* Ensure it covers at least the full height of the viewport */
+  padding: 20px; /* Adjust as needed */
+}
+
 .member-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 20px;
-  margin-top: 350px; /* Adjust this value to match the height of your sticky header */
-  padding: 20px; /* Optional: for some inner spacing */
+  margin-top: 0; /* Adjusted based on your new layout needs */
+  padding: 20px; /* For some inner spacing */
   overflow: auto;
   justify-content: center; /* Center grid items horizontally */
-  background-color: #ffcccc; /* Light shade of red */
+  /* Remove background-color: #ffcccc; from here */
 }
 
 .member {
