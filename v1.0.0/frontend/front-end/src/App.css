@@ -14,36 +14,52 @@
   }
 }
 
+/* Apply the gradient background to the whole app */
+.App {
+  text-align: center;
+  /* Gradient background from white to various shades of red */
+  background: linear-gradient(135deg, #FAFAFA, #F6CDCD, #F29F9F, #EE7272, #EA4444, #E61717);
+  color: white;
+  /* Ensure it covers the full height of the viewport */
+  min-height: 100vh;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
 /* Updated .App-header for a white background and horizontal layout */
 .App-header {
-  background-color: #fff; /* Set the header background to white */
-  padding: 1rem; /* Add some padding */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: Adds a shadow for depth */
-  position: sticky; /* Sticky position at the top */
-  top: 0; /* Stick to the top */
-  z-index: 1000; /* Make sure it's above other content */
-  display: flex; /* Use flexbox for layout */
-  justify-content: center; /* Center children horizontally */
-  align-items: center; /* Align children vertically */
-  min-height: initial; /* Override the previous 100vh */
-  width: 100%; /* Ensure the header is full width */
-  color: #333; /* Set a darker color for text for better contrast against white */
+  background-color: #fff; /* White background for contrast */
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: initial; /* Remove the 100vh to avoid taking the full screen height */
+  width: 100%; /* Full width */
+  color: #333; /* Darker text for better contrast */
 }
 
-/* Style for the navigation links */
+/* Style navigation links */
 .nav-link {
-  color: #333; /* Change link color for better contrast against white */
-  margin: 0 1rem; /* Spacing between links */
-  text-decoration: none; /* Remove underline from links */
-  font-weight: bold; /* Make the font bold */
-  padding: 0.5rem 1rem; /* Padding for larger click area */
-  display: inline-block; /* Treat the links as inline-block elements */
+  color: #333;
+  margin: 0 1rem;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  display: inline-block;
 }
-
-.app-diagonal-gradient {
-  background: linear-gradient(135deg,#FFFFFF, #FAFAFA, #F6CDCD, #F29F9F, #EE7272, #EA4444);
-  color: white; 
-} 
 
 .App-link {
   color: #61dafb;
