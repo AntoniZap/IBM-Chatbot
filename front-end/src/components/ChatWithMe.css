@@ -1,32 +1,36 @@
 .user-icon{
-    width: 50px;
-    height: 50px;
-    margin-left: 8px; /* Add margin to separate icon from message bubble */
+  width: 50px;
+  height: 50px;
 }
 
 .message-bubble {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end; /* Align messages to the right */
-  }
+  display: flex;
+  flex-direction: column;
+}
 .user {
-    background-color: #E6E6E6; /* Add background color for user message */
-  }
-  
-.bot {
-    flex-direction: row-reverse; /* switch message direction  */
-    background-color: #CA6267; /* background color for the bot message */
-  }
-.message {
-    display: flex;
-    align-items: center;
-    width: fit-content;
-    max-width: 450px;
-    margin-top: 8px;
-    margin-bottom: 8px;
-    font-size: 15px;
-    padding: 6px; /* Add padding to each message */
-    border-radius: 10px; /* Add border radius for rounded corners */
-  }
+  align-self: flex-end;
+  background-color: #E6E6E6; /* Add background color for user message */
+}
 
+.bot {
+  align-self: flex-start;
+  flex-direction: row-reverse; /* switch message direction  */
+  background-color: #CA6267; /* background color for the bot message */
+  color: #FFFFFF
+}
+.message {
+  display: flex;
+  width: fit-content;
+  max-width: 500px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  padding: 10px; /* Add padding to each message */
+  border-radius: 10px; /* Add border radius for rounded corners */
+}
+
+text{
+  text-align: justify; /* Center the text horizontally */
+  margin: auto; /* Center the text vertically */
+}
   
