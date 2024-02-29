@@ -34,9 +34,5 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: Run chatbot without LLM
-      env:
-        LLM: "TESTING"
-      run: |
-        python3 ./ChatbotConcept.py
+    
     

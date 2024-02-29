@@ -5,7 +5,6 @@ import ChatbotHelper
 import config
 import os
 
-import ChatbotConcept
 # Document loading and the link
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
@@ -22,9 +21,9 @@ from langchain_community.embeddings.sentence_transformer import SentenceTransfor
 from langchain.memory import ChatMessageHistory
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
-from normalise import Datafiniti
-from local import resolve
 
+from local import resolve
+from csv_to_langchain import CSVLoader
 
 #Following code, that is commented out can only be run with a local machine
 #You need to provide AI21 key, OPENAI key, LLAMA path in config.py
@@ -34,7 +33,7 @@ from local import resolve
 #
 # # Test 1 - LLM set to TESTING and creating new embedding
 #     os.environ['LLM'] = 'TESTING'
-#     documents = Datafiniti("Test_Dataset.csv").load()[:1]
+#     documents = CSVLoader("Test_Dataset.csv").load()[:1]
 #     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
 #     split_documents = text_splitter.split_documents(documents)
 #  # Create instances of ChatbotHelper.get_db()
@@ -76,10 +75,10 @@ from local import resolve
 #  # Check page_content for each document
 #     for i in range(len(docs)):
 #         assert docs[i].page_content == docs1[i].page_content
-#
+
 # # Test 3 - for LLM environ not set to TESTING and create new embeddings
 #     os.environ['LLM'] = 'AI21'
-#     documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
+#     documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
 #     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
 #     split_documents = text_splitter.split_documents(documents)
 #     model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -104,9 +103,6 @@ from local import resolve
 #     for i in range(len(docs)):
 #         assert docs[i].page_content == docs1[i].page_content
 #
-#
-#
-#
 # # Test 4 - LLM environment not set to Testing and chromedb exists
 #     os.environ['LLM'] = 'AI21'
 #  # Create instances of ChatbotHelper.get_db()
@@ -126,7 +122,7 @@ from local import resolve
 #  # Check page_content for each document
 #     for i in range(len(docs)):
 #         assert docs[i].page_content == docs1[i].page_content
-
+#
 
 def test_get_options():
    assert ChatbotHelper.get_options() == {"language" : "English"}
@@ -138,14 +134,14 @@ def test_get_options():
 #     llm = ChatbotHelper.get_llm()
 #     assert isinstance(llm, ChatOpenAI)
 #     del os.environ['LLM']
-
-#def test_get_llm_LLAMA():                                     # Check that LLAMA is obtained correctly
+#
+# def test_get_llm_LLAMA():                                     # Check that LLAMA is obtained correctly
 #    os.environ['LLM'] = "LLAMA"                               # Load 'LLAMA' as the LLM selection
 #    llm = ChatbotHelper.get_llm()
 #    assert hasattr(llm, 'model_path')
 #    assert llm.model_path == os.getenv('LLAMA_MODEL_PATH')
-#    del os.environ['LLM'] 
-
+#    del os.environ['LLM']
+#
 # def test_get_llm_AI21():                                     # Check that AI21 is obtained correctly
 #     os.environ['LLM'] = "AI21"                               # load 'AI21' as the LLM selection
 #     llm = ChatbotHelper.get_llm()

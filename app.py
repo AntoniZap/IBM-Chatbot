@@ -2,7 +2,7 @@ import os
 import os.path
 import sys
 
-# Document loading and the linke
+# Document loading and the link
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
