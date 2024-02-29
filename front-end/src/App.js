@@ -10,7 +10,7 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
+        <div className="container-fluid d-flex justify-content-center align-items-center">
           <div className="cover-container">
             <header className="masthead mb-auto">
               <div className="inner">

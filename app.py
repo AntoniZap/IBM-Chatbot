@@ -1,5 +1,6 @@
 import os
 import os.path
+import shutil
 
 # Document loading and the linke
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -42,19 +43,14 @@ def get_db():
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
     split_documents = text_splitter.split_documents(documents)
     if os.path.isdir(".chroma_db"):
-        print("Loading chromadb from filesystem")
-        db = Chroma(
-            persist_directory=".chroma_db",
-            embedding_function=SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-        )
-    else:
-        print("Creating new embeddings")
-        db = Chroma.from_documents(
-            split_documents,
-            SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"),
-            ids=[str(i) for i in range(len(split_documents))],
-            persist_directory=".chroma_db"
-        )
+        shutil.rmtree(".chroma_db")
+    print("Creating new embeddings")
+    db = Chroma.from_documents(
+        split_documents,
+        SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"),
+        ids=[str(i) for i in range(len(split_documents))],
+        persist_directory=".chroma_db"
+    )
     return db
 
 def query_chain(retriever):
@@ -96,7 +92,8 @@ def get_llm(llm_choice):
         llm = llms[llm_choice]
     except KeyError:
         if llm_choice == "llama":
-            setup = setup_llama
+            # setup = setup_llama
+            setup = setup_ai21b
         elif llm_choice == "ai21":
             setup = setup_ai21
         elif llm_choice == "chatgpt":

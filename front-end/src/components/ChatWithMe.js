@@ -81,9 +81,7 @@ function ChatWithMe() {
           </div>
         ))}
       </div>
-          <h3>Sources</h3>
-          <p>Feature coming soon!</p> 
-        {
+          {   
             answers && (
                 <>
                     <h3>Answers</h3>
@@ -97,14 +95,14 @@ function ChatWithMe() {
                                 <label>
                                     <h4>{msg.llm}</h4>
                                     <input value={msg.llm} id={"..."+index} type="radio" name="g1"/>
-                                    {msg.answer === undefined ?
-                                     <span style={{color: "red"}}>No data!</span>
+                                    {msg.answer === undefined
+                                     ? <span style={{color: "red"}}>No data!</span>
                                      : (msg.answer.trim() || <em>(Nothing was returned 🕳️)</em>)}
                                 </label>
                             </div>
-                            ))
+                        ))
                     }
-                        </center>
+                    </center>
                 </>
             )
         }
@@ -114,7 +112,7 @@ function ChatWithMe() {
         <option>LLAMA</option>
       </select>
       <input type="text" value={message} onChange={handleInputChange} />
-      <button onClick={handleSendMessage}>Send</button>
+      <button onClick={handleSendMessage} disabled={loading}>Send</button>
     </div>
   );
 }

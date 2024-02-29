@@ -45,7 +45,7 @@ label:hover {
 
 .llm-container:has(input:checked) {
     background-color: #DAA;
-    border: 2px outset #DAA;
+    /* border: 2px outset #DAA; */
 }
 .llm-container-box {
     display: flex;
@@ -57,7 +57,7 @@ label:hover {
     max-width: 450px;
     border-radius: 10px;
     background-color: buttonface;
-    border: 2px outset buttonface;
+    /* border: 2px outset buttonface; */
     margin-bottom: 10px;
     padding: 10px;
 }
