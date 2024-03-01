@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Bot from '../assets/bot.png';
+import User from '../assets/user.png';
+import './ChatWithMe.css'; // Import the CSS file
 
 function ChatWithMe() {
   axios.defaults.baseURL = 'http://localhost:5000';
@@ -11,41 +14,45 @@ function ChatWithMe() {
     setMessage(event.target.value);
   };
 
-  const handleOptionChange = (event) => {
-    const llm = event.target.value;
+  // const handleOptionChange = (event) => {
+  //   const llm = event.target.value;
     
-    axios.post('/llm', { llm: llm })
-        .then(response => {
-            console.log(response.data);
-        })
-        .catch(error => {
-            console.error('Error with LLM request:', error);
-        });
-  };
+  //   axios.post('/llm', { llm: llm })
+  //       .then(response => {
+  //           console.log(response.data);
+  //       })
+  //       .catch(error => {
+  //           console.error('Error with LLM request:', error);
+  //       });
+  // };
 
   const handleSendMessage = async () => {
-    setChatHistory([...chatHistory, "You: " + message]);
+    setChatHistory([...chatHistory, {sender: 'user', message: message }]);
     setMessage('');
     axios.post('/message', {message: message})
       .then(response => {
-        setChatHistory([...chatHistory, 'You: ' + message, "AI: " + response.data]);
+        setChatHistory([...chatHistory, { sender: 'user', message: message }, { sender: 'bot', message: response.data[0]}, { sender: 'bot', message: response.data[1]}, { sender: 'llama', message: response.data[2]}]);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
       });
   };
+  
   return (
     <div>
-      <div>
+      <div className="message-bubble">
         {chatHistory.map((msg, index) => (
-          <p key={index}>{msg}</p>
+          <div key={index} className={`message ${msg.sender}`}>
+            <text>{msg.message}</text>
+            <img src={msg.sender === 'user' ? User : Bot} alt={`${msg.sender} icon`} className="user-icon" /> 
+          </div>
         ))}
       </div>
-      <select onChange={handleOptionChange}>
+      {/* <select onChange={handleOptionChange}>
         <option>ChatGPT</option>
         <option>AI21</option>
         <option>LLAMA</option>
-      </select>
+      </select> */}
       <input type="text" value={message} onChange={handleInputChange} />
       <button onClick={handleSendMessage}>Send</button>
     </div>

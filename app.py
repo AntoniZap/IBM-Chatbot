@@ -26,6 +26,10 @@ from local import resolve
 # streamlit
 import streamlit as st
 
+
+
+
+global db
 @st.cache_resource()
 def get_db():
     documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
@@ -48,6 +52,7 @@ def get_db():
         )
     return db
 
+db = get_db()
 @st.cache_resource()
 def get_memory():
     global memory
@@ -77,7 +82,6 @@ def setup_env_var():
         setup("ChatGPT")
     else:
         setup(setup_env)
-
 
 def setup(llm_choice):
     global llm
@@ -112,8 +116,7 @@ def setup(llm_choice):
             MessagesPlaceholder(variable_name="messages")
         ]
     )
-    global db
-    db = get_db()
+    # db = get_db()
     retriever = db.as_retriever(k=1)
     global retrieval_chain
     document_chain = create_stuff_documents_chain(llm, prompt)
@@ -127,9 +130,15 @@ setup_env_var()
 
 @app.route('/message', methods=['POST'])
 def get_data():
+    
+    return ['ChatGPT:    ' + get_ai_response('ChatGPT'), 'AI21:    ' + get_ai_response('AI21'), 'LLAMA:    Disabled for demonstration!']
+
+
+def get_ai_response(llm_choice):
+    setup(llm_choice)
     data = request.json
     message=data.get('message')
-    print(message)
+    # print(message)
     memory.add_user_message(message)
     payload = { "messages": memory.messages }
     
@@ -150,8 +159,9 @@ def get_data():
             memory.add_ai_message(full)
         else:
             memory.add_ai_message(full["answer"])
-    return jsonify(full["answer"])
-    
+    print('Response = "' + full["answer"] +'"')
+    return full["answer"]
+
 @app.route('/llm', methods=['POST'])
 def get_llm():
     data = request.json
