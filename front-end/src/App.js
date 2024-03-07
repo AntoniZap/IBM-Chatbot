@@ -6,6 +6,7 @@ import AboutUs from './components/AboutUs';
 import 'bootstrap/dist/css/bootstrap.css';
 import './App.css';
 import { ReactComponent as Logo } from './logo.svg'; // Ensure the path is correct
+import InsertApiKey from './components/InsertApiKey';
 
 
 function App() {
@@ -17,9 +18,10 @@ function App() {
                   <Link className="nav-link" to="/">Home</Link>
                   <Link className="nav-link" to="/insert-document">Insert Document</Link>
                   <Link className="nav-link" to="/chat-with-me">Chat With Me</Link>
+                  <Link className="nav-link" to="/insert-api-key">Insert API Key</Link>
                   <Link className="nav-link" to="/about-us">About Us</Link>
                 </nav>
-                          </header>
+        </header>
 
 <div className="app-diagonal-gradient">
         <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
@@ -28,7 +30,7 @@ function App() {
               <Routes>
                 <Route path="/" element={
                   <div style={{ textAlign: 'left', marginLeft: '-500px' }}> {/* Inline styles for left alignment */}
-                    <h1 className="cover-heading">Welcome to Group 21's AI chatbot</h1>
+                    <h1 className="cover-heading">Welcome to Group 21&apos;s AI chatbot</h1>
                     <p className="lead">Welcome to the Chatbot designed by Group 21 as part of our work with IBM and Large Language Models.</p>
                     <p className="lead">To start just insert your document and ask as many questions as you want!</p>
                     <p className="lead">
@@ -38,6 +40,7 @@ function App() {
                 } />
                 <Route path="/insert-document" element={<InsertDocument />} />
                 <Route path="/chat-with-me" element={<ChatWithMe />} />
+                <Route className = "insert-api-key-123" path="/insert-api-key" element={<InsertApiKey/>} />
                 <Route path="/about-us" element={<AboutUs />} />
               </Routes>
             </main>
