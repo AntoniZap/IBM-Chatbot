@@ -41,30 +41,70 @@
 }
 
 .tutorial-OpenAi {
-    background-color: #CA6267;
     border-radius: 10px;
     margin-top: 30px;
 }
 
 .stepBystep-tutorial {
-    color: white;
-    margin-left: 20px;
+    color:#CA6267;
 }
 
 .step-1 {
     color: black; 
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     margin-left: 25px;
 }
 
-.OpenAi-button {
-    margin-left: 30px;
+.step-2 {
+    color: black; 
+    margin-left: 25px;
 }
+
+
+.OpenAi-button {
+    color: white;
+    width: 150px;
+    height: 50px;
+    background-color:#CA6267;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 10px;
+    margin-left: 100px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border-color: black;
+    border-radius: 10px;
+    font-size: 20px;
+
+}
+
+.OpenAi-button:hover {
+    background-color: black;
+    border-color: pink;
+}
+
 
 .para-1 {
     color: black;
+    margin-left: 25px;
+    font-size: 20px;
 }
 
+.login-image {
+    margin-left: 25px;
+    width: 1150px;
+    height: 70px;
+    margin-bottom: 20px;
+}
+
+.api-select-image {
+    margin-top: 20px;
+    margin-left: 25px;
+    width: 50%;
+    height: 40%;
+    margin-bottom: 20px;
+
+}
 .hello{
     top:0;
     right:0;
