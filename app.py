@@ -28,11 +28,13 @@ import streamlit as st
 
 @st.cache_resource()
 def get_db():
-    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
+    #documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:200]
+    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
     split_documents = text_splitter.split_documents(documents)
     model = SentenceTransformer("all-MiniLM-L6-v2")
-    if os.path.isdir(".chroma_db"):
+    if(False):
+    #if os.path.isdir(".chroma_db"):
         print("Loading chromadb from filesystem")
         db = Chroma(
             persist_directory=".chroma_db",
