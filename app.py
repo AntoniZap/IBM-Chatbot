@@ -25,7 +25,6 @@ from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Iterator, List, Optional, Union
 from dataclasses import dataclass, field
-from queue import Queue
 import time
 import datetime
 
@@ -94,11 +93,11 @@ def get_state():
     global state
     return state
 
-def get_llm(llm_choice):
-    global llms
+def get_raw_llm(llm_choice):
+    global raw_llms
     llm_choice = llm_choice.lower()
     try:
-        llm = llms[llm_choice]
+        llm = raw_llms[llm_choice]
     except KeyError:
         if llm_choice == "llama":
             setup = setup_llama
@@ -109,6 +108,16 @@ def get_llm(llm_choice):
         else:
             raise KeyError()
         llm = setup()
+        raw_llms[llm_choice] = llm
+    return raw_llms[llm_choice]
+    
+def get_llm(llm_choice):
+    global llms
+    llm_choice = llm_choice.lower()
+    try:
+        llm = llms[llm_choice]
+    except KeyError:
+        llm = get_raw_llm(llm_choice)
         system_prompt = resolve(options["language"], "system_prompt")
         prompt = ChatPromptTemplate.from_messages(
             [
@@ -123,13 +132,6 @@ def get_llm(llm_choice):
             .assign(answer=document_chain)
         llms[llm_choice] = chain
     return llms[llm_choice]
-
-# Flask
-set_state(None)
-llms = {}
-queue = Queue()
-memory = ChatMessageHistory()
-options = { "language" : "English" }
 
 @dataclass
 class Closure:
@@ -175,52 +177,50 @@ def infer(messages, chain, callback):
             callback(item, full)
     return full
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from flask_socketio import SocketIO
-app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
-CORS(app)
-
-@app.route('/message', methods=['POST'])
-def get_data():
-    global state
-    if state is not None:
-        return jsonify(
-            error="Already running inference",
-            state=str(state)
-        ), 400
-    data = request.json
-    llm_choices = data.get('llms') or []
-    if len(llm_choices) == 0:
-        return jsonify(answers={})
-    message = data.get('message')
-    set_state(PendingInferenceComplete(data=data))
-    memory.add_user_message(message)
-    answers = _get_data(memory.messages, llm_choices)
-    set_state(PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers }))
-    return jsonify(answers)
-
-
-@app.route('/selectAnswer', methods=['POST'])
-def select_response():
-    data = request.json
-    global state
-    if type(state) is not PendingResponseChoice:
-        return jsonify(400)
-    chosen_answer = data.get('llm')
-    global memory
-    memory.add_ai_message(state.answers[chosen_answer.lower()])
-    set_state(None)
-    return jsonify(200)
-
-@app.route('/stream', methods=['POST'])
-def _stream():
-    def generate():
-        for i in range(10):
-            time.sleep(1)
-            yield str(i) + "\n"
-    return generate()
+set_state(None)
+llms = {}
+raw_llms = {}
+memory = ChatMessageHistory()
+options = { "language" : "English" }
 
 if __name__ == "__main__":
+    from flask import Flask, request, jsonify
+    from flask_cors import CORS
+    from flask_socketio import SocketIO
+    app = Flask(__name__)
+    socketio = SocketIO(app, cors_allowed_origins="*")
+    CORS(app)
+
+    @app.route('/message', methods=['POST'])
+    def get_data():
+        global state
+        if state is not None:
+            return jsonify(
+                error="Already running inference",
+                state=str(state)
+            ), 400
+        data = request.json
+        llm_choices = data.get('llms') or []
+        if len(llm_choices) == 0:
+            return jsonify(answers={})
+        message = data.get('message')
+        set_state(PendingInferenceComplete(data=data))
+        memory.add_user_message(message)
+        answers = _get_data(memory.messages, llm_choices)
+        set_state(PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers }))
+        return jsonify(answers)
+    
+    
+    @app.route('/selectAnswer', methods=['POST'])
+    def select_response():
+        data = request.json
+        global state
+        if type(state) is not PendingResponseChoice:
+            return jsonify(400)
+        chosen_answer = data.get('llm')
+        global memory
+        memory.add_ai_message(state.answers[chosen_answer.lower()])
+        set_state(None)
+        return jsonify(200)
+
     app.run(port=5000)

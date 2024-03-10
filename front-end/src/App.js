@@ -11,6 +11,7 @@ import { ReactComponent as Logo } from './logo.svg'; // Ensure the path is corre
 function App() {
   return (
     <Router>
+        <div className="top">
       <header className="App-header">
         <Logo className="App-logo" alt="logo" /> {/* Logo added here */}
                 <nav className="nav nav-masthead justify-content-center">
@@ -19,21 +20,20 @@ function App() {
                   <Link className="nav-link" to="/chat-with-me">Chat With Me</Link>
                   <Link className="nav-link" to="/about-us">About Us</Link>
                 </nav>
-                          </header>
-
-<div className="app-diagonal-gradient">
-        <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
-          <div className="cover-container">
+      </header>
+        <div className="container-fluid d-flex justify-content-center align-items-stretch app-diagonal-gradient main-parent">
             <main role="main" className="inner cover">
               <Routes>
                 <Route path="/" element={
-                  <div style={{ textAlign: 'left', marginLeft: '-500px' }}> {/* Inline styles for left alignment */}
-                    <h1 className="cover-heading">Welcome to Group 21's AI chatbot</h1>
-                    <p className="lead">Welcome to the Chatbot designed by Group 21 as part of our work with IBM and Large Language Models.</p>
-                    <p className="lead">To start just insert your document and ask as many questions as you want!</p>
-                    <p className="lead">
-                      <a href="https://elastic.co/what-is/large-language-models" className="btn btn-lg btn-secondary">Learn more</a>
-                    </p>
+                  <div className="d-flex align-items-center" style={{ height: "100%", textAlign: 'left', marginLeft: '-500px' }}> {/* Inline styles for left alignment */}
+                      <div>
+                          <h1 className="cover-heading">Welcome to Group 21's AI chatbot</h1>
+                          <p className="lead">Welcome to the Chatbot designed by Group 21 as part of our work with IBM and Large Language Models.</p>
+                          <p className="lead">To start just insert your document and ask as many questions as you want!</p>
+                          <p className="lead">
+                              <a href="https://elastic.co/what-is/large-language-models" className="btn btn-lg btn-secondary">Learn more</a>
+                          </p>
+                      </div>
                   </div>
                 } />
                 <Route path="/insert-document" element={<InsertDocument />} />
@@ -43,7 +43,6 @@ function App() {
             </main>
           </div>
         </div>
-      </div>
     </Router>
   );
 }
