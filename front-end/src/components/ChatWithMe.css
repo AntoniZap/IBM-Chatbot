@@ -42,4 +42,46 @@ text{
   text-align: justify;          /* Make the text aligned on each side */
   margin: auto;                 /* Center the text vertically */
 }
-  
+
+.llm-container input {
+    display: none;
+    user-select: none;
+}
+
+label:hover {
+    filter: brightness(2.0);
+}
+
+.llm-container:has(label:hover) {
+    background-color: #E6E6E6;
+}
+
+.llm-container:has(input:checked) {
+    background-color: #ca626784;
+    /* border: 2px outset #DAA; */
+}
+.llm-container-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.llm-container {
+    max-width: 450px;
+    border-radius: 10px;
+    background-color: buttonface;
+    /* border: 2px outset buttonface; */
+    margin-bottom: 10px;
+    padding: 10px;
+    color: black;
+}
+
+.loading {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 50%;
+  }
+}
