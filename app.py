@@ -43,18 +43,32 @@ class PendingResponseChoice:
 
 @functools.cache
 def get_db():
-    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
-    split_documents = text_splitter.split_documents(documents)
-    if os.path.isdir(".chroma_db"):
-        shutil.rmtree(".chroma_db")
-    print("Creating new embeddings")
-    db = Chroma.from_documents(
-        split_documents,
-        SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"),
-        ids=[str(i) for i in range(len(split_documents))],
-        persist_directory=".chroma_db"
+    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()
+    
+    print("Loading persisted ChromaDB data store")
+    db = Chroma(
+        persist_directory=".chroma_db",
+        embedding_function=SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     )
+
+    print("Figuring out which documents exist already")
+    persisted_documents = db.get()
+    existing_documents = set()
+    for metadata in persisted_documents["metadatas"]:
+        existing_documents.add((metadata["source"], metadata["row"]))
+    new_documents = [document for document in documents
+                     if (document.metadata["source"], document.metadata["row"])
+                     not in existing_documents]
+
+    if len(new_documents) > 0:
+        split_documents = text_splitter.split_documents(new_documents)
+        print(f"Split {len(new_documents)} documents")
+        db.add_documents(split_documents)
+        print(f"Added {len(new_documents)} documents")
+    else:
+        print(f"All {len(new_documents)} are already in the database")
+        
     return db
 
 def query_chain(retriever):
