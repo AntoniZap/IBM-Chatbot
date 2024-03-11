@@ -111,3 +111,8 @@ label:hover {
 .input-form textarea {
     flex: 1;
 }
+
+blockquote {
+    padding-left: 10px;
+    border-left: 2px solid #B6B6B6;
+}
