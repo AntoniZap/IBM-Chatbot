@@ -20,8 +20,8 @@ function InsertApiKey() {
         <div>
             <div className = "openai-card"> 
                 <header>
-                 <h1 className="header-api">How to insert your OpenAI Api Key</h1>
-                 <h2 className="h2-api">Already have an OpenAi Api Key?</h2>
+                 <h1 className="header-api">How to insert your OpenAI API Key</h1>
+                 <h2 className="h2-api">Already have an OpenAi API Key?</h2>
                 </header>
                 <p className= "phase1-OpenAi">Insert it below to get going, otherwise follow our quick and easy tutorial below!</p>
                 <input type="text" className = "input-val" onChange = {change} value = {apiKey}/>

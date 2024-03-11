@@ -1,6 +1,10 @@
 .openai-card {
-    margin-left: -150px;
-    margin-top: 1300px;
+    margin-top: 1325px;
+    text-align: center;
+}
+
+.openai21-card {
+    margin-top: 400px;
     text-align: center;
 }
 
@@ -48,6 +52,11 @@
     font-weight: bold;
 }
 
+.tutorial-OpenAi21 {
+    margin-left: 25px;
+    margin-top: 30px;
+}
+
 .tutorial-OpenAi {
     border-radius: 10px;
     margin-left: -200px;
@@ -69,6 +78,11 @@
     margin-left: 25px;
 }
 
+.step-3 {
+    color: black; 
+    margin-left: 25px;
+}
+ 
 .step-6 {
     color: black; 
     margin-left: 25px;

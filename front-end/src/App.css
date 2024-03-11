@@ -41,6 +41,25 @@
   display: inline-block; /* Treat the links as inline-block elements */
 }
 
+.dropdown {
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  width: 200px;
+  z-index: 100;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
 .app-diagonal-gradient {
   /* background: linear-gradient(135deg, #FAFAFA, #F3757C); */
   color: white;
