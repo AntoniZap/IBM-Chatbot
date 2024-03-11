@@ -40,7 +40,8 @@ function App() {
                 } />
                 <Route path="/insert-document" element={<InsertDocument />} />
                 <Route path="/chat-with-me" element={<ChatWithMe />} />
-                <Route className = "insert-api-key-123" path="/insert-api-key" element={<InsertApiKey/>} />
+                <Route className = "insert-api-key-123" path="/insert-api-key" element={
+                <InsertApiKey/>} />
                 <Route path="/about-us" element={<AboutUs />} />
               </Routes>
             </main>

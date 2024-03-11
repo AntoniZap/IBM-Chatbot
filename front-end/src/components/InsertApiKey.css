@@ -1,3 +1,9 @@
+.openai-card {
+    margin-left: -150px;
+    margin-top: 1300px;
+    text-align: center;
+}
+
 .input-val{
     width: 300px;
     height:55px;
@@ -24,7 +30,8 @@
 }
 
 .API-button:hover {
-    background-color: rgb(204, 61, 173);
+    background-color:  rgb(0, 140, 255);
+    border-color: pink;
 }
 
 .header-api {
@@ -37,11 +44,13 @@
 }
 
 .phase1-OpenAi {
-    color: black;
+    color: blue;
+    font-weight: bold;
 }
 
 .tutorial-OpenAi {
     border-radius: 10px;
+    margin-left: -200px;
     margin-top: 30px;
 }
 
@@ -60,29 +69,19 @@
     margin-left: 25px;
 }
 
-
-.OpenAi-button {
-    color: white;
-    width: 150px;
-    height: 50px;
-    background-color:#CA6267;
-    font-size: 15px;
-    font-weight: bold;
-    padding: 10px;
-    margin-left: 100px;
-    margin-bottom: 20px;
-    border: 1px solid;
-    border-color: black;
-    border-radius: 10px;
-    font-size: 20px;
-
+.step-6 {
+    color: black; 
+    margin-left: 25px;
+    margin-bottom: 50px; 
 }
 
-.OpenAi-button:hover {
-    background-color: black;
-    border-color: pink;
+.OpenAi-href {
+    color:#CA6267;
 }
 
+.OpenAi-href:hover {
+    color:rgb(0, 68, 255);
+}
 
 .para-1 {
     color: black;
@@ -95,17 +94,19 @@
     width: 1150px;
     height: 70px;
     margin-bottom: 20px;
+
 }
 
 .api-select-image {
     margin-top: 20px;
-    margin-left: 25px;
+    margin-left: 100px;
     width: 50%;
     height: 40%;
     margin-bottom: 20px;
 
 }
-.hello{
-    top:0;
-    right:0;
+
+.openai-logo {
+    width: 50px;
+    height:50px;
 }
