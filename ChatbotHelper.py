@@ -19,19 +19,16 @@ from langchain.memory import ChatMessageHistory
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Our own stuff
-from normalise import Datafiniti
 from local import resolve
 import config
 
 # streamlit
 import streamlit as st
+from csv_to_langchain import CSVLoader
 
 @st.cache_resource()
 def get_db():
-    if  os.getenv('LLM') == "TESTING":
-        documents = Datafiniti("Test_Dataset.csv").load()[:1]
-    else:
-        documents = Datafiniti("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10] # take the first 10 rows
+    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
     split_documents = text_splitter.split_documents(documents)
     model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -50,6 +47,7 @@ def get_db():
             persist_directory=".chroma_db"
         )
     return db
+
 
 @st.cache_resource()
 def get_llm():

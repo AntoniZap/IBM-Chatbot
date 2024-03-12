@@ -1,27 +1,64 @@
+* { box-sizing: border-box; }
+
+/* App.css */
 .App {
-  text-align: center;
+    text-align: center;
+    margin: 50px;
 }
 
 .App-logo {
-  height: 40vmin;
+  height: 8vmin; /* Adjust the size of the logo */
   pointer-events: none;
+  margin-right: 20 px; /* Add some space between the logo and the nav links */
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Remove or comment out the animation if not needed for the logo */
+/* @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+    animation: none; /* This disables the spinning animation */
+
+
+/* Updated .App-header for a white background and horizontal layout */
+.App-header {
+    flex: 0 1 auto;
+  background-color: #fff; /* Set the header background to white */
+  padding: 1rem; /* Add some padding */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: Adds a shadow for depth */
+  position: sticky; /* Sticky position at the top */
+  top: 0; /* Stick to the top */
+  z-index: 1000; /* Make sure it's above other content */
+  display: flex; /* Use flexbox for layout */
+  justify-content: center; /* Center children horizontally */
+  align-items: center; /* Align children vertically */
+  min-height: initial; /* Override the previous 100vh */
+  width: 100%; /* Ensure the header is full width */
+  color: #333; /* Set a darker color for text for better contrast against white */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+/* Style for the navigation links */
+.nav-link {
+  color: #333; /* Change link color for better contrast against white */
+  margin: 0 1rem; /* Spacing between links */
+  text-decoration: none; /* Remove underline from links */
+  font-weight: bold; /* Make the font bold */
+  padding: 0.5rem 1rem; /* Padding for larger click area */
+  display: inline-block; /* Treat the links as inline-block elements */
+}
+
+.app-diagonal-gradient {
+  /* background: linear-gradient(135deg, #FAFAFA, #F3757C); */
   color: white;
+  /* background-repeat: no-repeat;
+  background-attachment: fixed; */
+} 
+
+
+.cover-heading,
+.lead {
+  padding-left: 15px; /* Optional: Add some padding to ensure the text is not right against the screen edge */
+  text-align: left; /* Aligns text to the left */
+  color: black;
+  
 }
 
 .App-link {
@@ -37,8 +74,7 @@
   }
 }
 
-/* Add this to your App.css file */
-
+/* Profile icon, name, role, and about styles remain unchanged */
 .App .member .profile-icon {
   width: 15px; /* Adjust as needed */
   height: 15px; /* Adjust as needed */
@@ -48,4 +84,20 @@
 .App .member .member-role,
 .App .member .member-about {
   font-size: 14px; /* Adjust as needed */
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+}
+
+.main-parent {
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+main {
+    height: 100%;
 }

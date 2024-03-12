@@ -1,24 +1,41 @@
+/* AboutUs.css */
 .member-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 20px;
-    overflow: auto;
-  }
-  
-  .profile-icon {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .member-name{
-    font-size: 30px;
-  }
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 40px; /* Optional: for some inner spacing */
+  justify-content: center; /* Center grid items horizontally */
+  width: 100vw; /* This will make the container exactly the width of the viewport */
+  position: relative; /* To offset any potential side effects of using vw */
+  height: 100%;
+}
 
-  .member-role {
-    font-size: 20px;
-  }
-  
-  .member-about {
-    font-size: 14px;
-  }
-  
+.member {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  text-align: center; /* Center text */
+  color: black;
+}
+
+.profile-icon {
+  width: 100px;
+  height: 100px;
+  object-fit: cover; /* To make sure images fit well in the box */
+  border-radius: 50%; /* Optional: if you want round images */
+}
+
+.member-name {
+  font-size: 30px;
+  margin-top: 10px; /* Space between image and name */
+}
+
+.member-role {
+  font-size: 20px;
+  margin-top: 5px; /* Space between name and role */
+}
+
+.member-about {
+  font-size: 14px;
+  margin-top: 5px; /* Space between role and about */
+}
