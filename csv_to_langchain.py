@@ -1,7 +1,7 @@
 # Document loading and the linke
 import os
 import csv
-from typing import Dict, List, Optional, Generator
+from typing import Dict, List, Optional
 from langchain.document_loaders.base import BaseLoader
 from langchain.docstore.document import Document
 
@@ -91,47 +91,3 @@ class CSVLoader(BaseLoader):
                 doc = Document(page_content=content, metadata=metadata)
                 docs.append(doc)
         return docs
-
-class ChunkedCSVLoader(CSVLoader):
-    def __init__(self, file_path, chunk_size=1000, **kwargs):
-        super().__init__(file_path=file_path, **kwargs)
-        self.chunk_size = chunk_size
-        self.chunks = []
-
-    def load_chunks(self, start_chunk_index=0) -> Generator[List[Document], None, None]:
-        with open(self.file_path, newline="", encoding="utf8") as csvfile:
-            csv_reader = csv.DictReader(csvfile, **self.csv_args)
-            chunk = []
-            for i, row in enumerate(csv_reader):
-                content = ""
-                for k, v in row.items():
-                    if (k == "reviews.text") or (k == "name"):
-                        content += f"{k.strip()}: {v.strip()}\n"
-                
-                source = row[self.source_column] if self.source_column else self.file_path
-                title = row.get("reviews.title", "")
-                rating = row.get("reviews.rating", "")
-                
-                metadata = {"source": source, "row": i, "reviews.title": title, "reviews.rating": rating}
-                
-                doc = Document(page_content=content, metadata=metadata)
-
-                if i >= start_chunk_index * self.chunk_size:
-                    chunk.append(doc)
-
-                if len(chunk) == self.chunk_size:
-                    yield chunk
-                    self.chunks.append(chunk)
-                    chunk = []
-
-            if chunk:
-                yield chunk
-                self.chunks.append(chunk)
-
-    def load(self) -> List[Document]:
-        for chunk in self.load_chunks():
-            # Process each chunk if needed
-            pass
-
-    def get_chunks(self) -> List[List[Document]]:
-        return self.chunks
