@@ -15,6 +15,7 @@ from langchain_community.embeddings.sentence_transformer import SentenceTransfor
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ChatMessageHistory
 
+from ChatbotHelper import get_db, query_chain, setup_llama, setup_ai21, setup_chatgpt
 # Our own stuff
 from csv_to_langchain import CSVLoader
 from local import resolve
@@ -28,10 +29,12 @@ from dataclasses import dataclass, field
 import time
 import datetime
 
+
 @dataclass
 class PendingInferenceComplete:
     data: object
     timestamp: str = field(default_factory=lambda: str(datetime.datetime.now()))
+
 
 @dataclass
 class PendingResponseChoice:
@@ -40,49 +43,6 @@ class PendingResponseChoice:
     A mapping from llm names → answers
     """
 
-@functools.cache
-def get_db():
-    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
-    split_documents = text_splitter.split_documents(documents)
-    if os.path.isdir(".chroma_db"):
-        shutil.rmtree(".chroma_db")
-    print("Creating new embeddings")
-    db = Chroma.from_documents(
-        split_documents,
-        SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"),
-        ids=[str(i) for i in range(len(split_documents))],
-        persist_directory=".chroma_db"
-    )
-    return db
-
-def query_chain(retriever):
-    return (lambda params: params["messages"][-1].content) | retriever
-
-def setup_llama():
-    from langchain_community.llms import LlamaCpp
-    from langchain.callbacks.manager import CallbackManager
-    from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-    from llama_cpp import LlamaCache
-    callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-    llm = LlamaCpp(
-        model_path= os.getenv('LLAMA_MODEL_PATH'),
-        callback_manager = callback_manager,
-        verbose = True,
-        n_ctx=1024,
-    )
-    llm.client.set_cache(LlamaCache())
-    return llm
-
-def setup_chatgpt():
-    from langchain_openai import ChatOpenAI
-    llm = ChatOpenAI(temperature = 0.6)
-    return llm
-
-def setup_ai21():
-    from langchain_community.llms import AI21
-    llm = AI21(temperature=0)
-    return llm
 
 def set_state(next_state):
     global state
@@ -110,7 +70,8 @@ def get_raw_llm(llm_choice):
         llm = setup()
         raw_llms[llm_choice] = llm
     return raw_llms[llm_choice]
-    
+
+
 def get_llm(llm_choice):
     global llms
     llm_choice = llm_choice.lower()
@@ -133,15 +94,18 @@ def get_llm(llm_choice):
         llms[llm_choice] = chain
     return llms[llm_choice]
 
+
 @dataclass
 class Closure:
     llm: str
+
     def __call__(self, part, whole):
         print(f"got message from `{self.llm}`: {part}")
         socketio.emit("socket", {
             "llm": self.llm,
             "answer": whole.get("answer", "")
         })
+
 
 def _get_data(messages, llm_choices):
     jobs = []
@@ -154,19 +118,20 @@ def _get_data(messages, llm_choices):
 
     answers = []
     # sources = [doc.page_content for doc in full[0]["context"]]
-        
+
     for llm, job in jobs:
         answer = job.result()
         answers.append({
             "llm": llm,
             "answer": answer["answer"]
         })
-    
+
     return answers
+
 
 def infer(messages, chain, callback):
     print("Starting inference for LLM")
-    payload = { "messages": messages }
+    payload = {"messages": messages}
     full = None
     for item in chain.stream(payload):
         if full is None:
@@ -177,19 +142,22 @@ def infer(messages, chain, callback):
             callback(item, full)
     return full
 
+
 set_state(None)
 llms = {}
 raw_llms = {}
 memory = ChatMessageHistory()
-options = { "language" : "English" }
+options = {"language": "English"}
 
 if __name__ == "__main__":
     from flask import Flask, request, jsonify
     from flask_cors import CORS
     from flask_socketio import SocketIO
+
     app = Flask(__name__)
     socketio = SocketIO(app, cors_allowed_origins="*")
     CORS(app)
+
 
     @app.route('/message', methods=['POST'])
     def get_data():
@@ -207,10 +175,10 @@ if __name__ == "__main__":
         set_state(PendingInferenceComplete(data=data))
         memory.add_user_message(message)
         answers = _get_data(memory.messages, llm_choices)
-        set_state(PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers }))
+        set_state(PendingResponseChoice(answers={answer["llm"]: answer["answer"] for answer in answers}))
         return jsonify(answers)
-    
-    
+
+
     @app.route('/selectAnswer', methods=['POST'])
     def select_response():
         data = request.json
@@ -222,5 +190,6 @@ if __name__ == "__main__":
         memory.add_ai_message(state.answers[chosen_answer.lower()])
         set_state(None)
         return jsonify(200)
+
 
     app.run(port=5000)
