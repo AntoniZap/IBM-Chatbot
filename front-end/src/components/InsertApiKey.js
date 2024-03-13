@@ -11,7 +11,7 @@ import createSecretApiKey from './images/createapikey.png'
 function InsertApiKey() {
     const [apiKey, setApiKey] = useState("Enter your OpenAI API Key Here")
     const click = () => {
-        alert(apiKey)
+        alert(apiKey);
     }
     const change = () => {
         setApiKey(event.target.value)
