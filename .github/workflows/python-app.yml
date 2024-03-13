@@ -33,6 +33,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        echo "Secret variable value: $AI21_API_KEY"
         pytest
       env:
         AI21_API_KEY: ${{ secrets.AI21_API_KEY }}
