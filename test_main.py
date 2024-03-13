@@ -26,20 +26,13 @@ def test_get_db():
 def test_get_options():
     assert ChatbotHelper.get_options() == {"language": "English"}
 
-# These tests can be run provided user provides API keys
-# def test_get_llm_ChatOpenAI():                                  # Check that ChatOpenAI is obtained correctly
-#     os.environ['LLM'] = "CHATGPT"                               # Load 'CHATGPT' as the LLM selection
-#     from langchain_openai import ChatOpenAI
-#     llm = ChatbotHelper.setup_chatgpt()
-#     assert isinstance(llm, ChatOpenAI)
-#     del os.environ['LLM']
-
-# def test_get_llm_LLAMA():                                     # Check that LLAMA is obtained correctly
-#    os.environ['LLM'] = "LLAMA"                               # Load 'LLAMA' as the LLM selection
-#    llm = ChatbotHelper.setup_llama()
-#    assert hasattr(llm, 'model_path')
-#    assert llm.model_path == os.getenv('LLAMA_MODEL_PATH')
-#    del os.environ['LLM']
+# 3 tests bellow can only be run provided user provides API keys
+def test_get_llm_ChatOpenAI():                                  # Check that ChatOpenAI is obtained correctly
+    os.environ['LLM'] = "CHATGPT"                               # Load 'CHATGPT' as the LLM selection
+    from langchain_openai import ChatOpenAI
+    llm = ChatbotHelper.setup_chatgpt()
+    assert isinstance(llm, ChatOpenAI)
+    del os.environ['LLM']
 
 def test_get_llm_AI21():                                     # Check that AI21 is obtained correctly
     os.environ['LLM'] = "AI21"                               # load 'AI21' as the LLM selection
@@ -47,6 +40,13 @@ def test_get_llm_AI21():                                     # Check that AI21 i
     from langchain.llms import AI21
     assert isinstance(llm, AI21)
     del os.environ['LLM']
+
+# def test_get_llm_LLAMA():                                     # Check that LLAMA is obtained correctly
+#    os.environ['LLM'] = "LLAMA"                               # Load 'LLAMA' as the LLM selection
+#    llm = ChatbotHelper.setup_llama()
+#    assert hasattr(llm, 'model_path')
+#    assert llm.model_path == os.getenv('LLAMA_MODEL_PATH')
+#    del os.environ['LLM']
 
 def test_get_memory():  # Check that the chat history is loaded correctly
     from langchain.memory import ChatMessageHistory
@@ -58,7 +58,7 @@ def test_get_memory_unique():  # Check that calling the function multiple times 
     assert memory1 == memory2
 
 
-# Below are tests that were created but no longer are applicable due to change in functions
+# Below are tests that were created but no longer are relevant due to change in functions
 # def test_get_db_legacy():
 #
 # # Test 1 - LLM set to TESTING and creating new embedding
