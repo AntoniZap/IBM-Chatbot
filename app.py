@@ -1,42 +1,54 @@
 import os
 import os.path
-import sys
+import shutil
 
 # Document loading and the link
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
-from langchain_core.documents.base import Document
 from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnablePassthrough
+from langchain.docstore.document import Document
 
 # ✨AI✨
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ChatMessageHistory
-from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Our own stuff
 from csv_to_langchain import CSVLoader
 from local import resolve
+import config
 
-# streamlit
-import streamlit as st
+import functools
+from threading import Thread
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, Iterator, List, Optional, Union
+from dataclasses import dataclass, field
+import time
+import datetime
 
+@dataclass
+class PendingInferenceComplete:
+    data: object
+    timestamp: str = field(default_factory=lambda: str(datetime.datetime.now()))
 
+@dataclass
+class PendingResponseChoice:
+    answers: Dict[str, str]
+    """
+    A mapping from llm names → answers
+    """
 
-
-global db
-@st.cache_resource()
+@functools.cache
 def get_db():
-    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
+    #documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:200]
+    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
     split_documents = text_splitter.split_documents(documents)
-    model = SentenceTransformer("all-MiniLM-L6-v2")
-    if os.path.isdir(".chroma_db"):
+    if(False):
+    #if os.path.isdir(".chroma_db"):
         print("Loading chromadb from filesystem")
         db = Chroma(
             persist_directory=".chroma_db",
@@ -50,124 +62,175 @@ def get_db():
             ids=[str(i) for i in range(len(split_documents))],
             persist_directory=".chroma_db"
         )
+        
     return db
-
-db = get_db()
-@st.cache_resource()
-def get_memory():
-    global memory
-    memory = ChatMessageHistory()
-    return memory
-
-@st.cache_resource()
-def get_options():
-    global options
-    options = { "language" : "English" }
-    return options
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
 
-
-# Flask
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-app = Flask(__name__)
-CORS(app)
-
-
-def setup_env_var():
-    setup_env = str(os.getenv('LLM'))
-    if setup_env == 'None':
-        setup("ChatGPT")
-    else:
-        setup(setup_env)
-
-def setup(llm_choice):
-    global llm
-    if llm_choice == "LLAMA":
-        from langchain_community.llms import LlamaCpp
-        from langchain.callbacks.manager import CallbackManager
-        from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-        
-        llm = LlamaCpp(
-            model_path= os.getenv('LLAMA_MODEL_PATH'),
-            callback_manager = callback_manager,
-            verbose = True,
-            n_ctx=1024,
-        )
-    elif llm_choice == "ChatGPT":
-        from langchain_openai import ChatOpenAI
-        llm = ChatOpenAI(temperature = 0.6)
-    elif llm_choice == "AI21":
-       from langchain.llms import AI21
-       llm = AI21(temperature=0)
-    global memory
-    memory = get_memory()
-    global options
-    options = get_options()
-
-    # prompt template
-    system_prompt = resolve(options["language"], "system_prompt")
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt + "\n{context}\n----------"),
-            MessagesPlaceholder(variable_name="messages")
-        ]
+def setup_llama():
+    from langchain_community.llms import LlamaCpp
+    from langchain.callbacks.manager import CallbackManager
+    from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+    from llama_cpp import LlamaCache
+    callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+    llm = LlamaCpp(
+        model_path= os.getenv('LLAMA_MODEL_PATH'),
+        callback_manager = callback_manager,
+        verbose = True,
+        n_ctx=1024,
     )
-    # db = get_db()
-    retriever = db.as_retriever(k=1)
-    global retrieval_chain
-    document_chain = create_stuff_documents_chain(llm, prompt)
-    retrieval_chain = RunnablePassthrough \
-        .assign(context=query_chain(retriever)) \
-        .assign(answer=document_chain)
-    
-    return llm           
+    llm.client.set_cache(LlamaCache())
+    return llm
 
-setup_env_var()
+def setup_chatgpt():
+    from langchain_openai import ChatOpenAI
+    llm = ChatOpenAI(temperature = 0.6)
+    return llm
 
-@app.route('/message', methods=['POST'])
-def get_data():
-    
-    return ['ChatGPT:    ' + get_ai_response('ChatGPT'), 'AI21:    ' + get_ai_response('AI21'), 'LLAMA:    Disabled for demonstration!']
+def setup_ai21():
+    from langchain_community.llms import AI21
+    llm = AI21(temperature=0)
+    return llm
 
+def set_state(next_state):
+    global state
+    state = next_state
+    print(f"Transitioned to next state {state}")
 
-def get_ai_response(llm_choice):
-    setup(llm_choice)
-    data = request.json
-    message=data.get('message')
-    # print(message)
-    memory.add_user_message(message)
-    payload = { "messages": memory.messages }
-    
-    full = None
+def get_state():
+    global state
+    return state
 
-    with st.spinner(resolve(options["language"], "loading")):
-        for item in retrieval_chain.stream(payload):
-            if full is None:
-                full = item
-            else:
-                full += item
-            
-            print(item)
-        st.write("\n")
-
-    if full is not None:
-        if type(full) is str:
-            memory.add_ai_message(full)
+def get_raw_llm(llm_choice):
+    global raw_llms
+    llm_choice = llm_choice.lower()
+    try:
+        llm = raw_llms[llm_choice]
+    except KeyError:
+        if llm_choice == "llama":
+            setup = setup_llama
+        elif llm_choice == "ai21":
+            setup = setup_ai21
+        elif llm_choice == "chatgpt":
+            setup = setup_chatgpt
         else:
-            memory.add_ai_message(full["answer"])
-    print('Response = "' + full["answer"] +'"')
-    return full["answer"]
-
-@app.route('/llm', methods=['POST'])
-def get_llm():
-    data = request.json
-    llm_choice=data.get('llm')
-    setup(llm_choice)
-    return jsonify(200)
+            raise KeyError()
+        llm = setup()
+        raw_llms[llm_choice] = llm
+    return raw_llms[llm_choice]
     
+def get_llm(llm_choice):
+    global llms
+    llm_choice = llm_choice.lower()
+    try:
+        llm = llms[llm_choice]
+    except KeyError:
+        llm = get_raw_llm(llm_choice)
+        system_prompt = resolve(options["language"], "system_prompt")
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", f"{system_prompt}\n\\{{context}}\n----------"),
+                MessagesPlaceholder(variable_name="messages")
+            ]
+        )
+        document_chain = create_stuff_documents_chain(llm, prompt)
+        chain = RunnablePassthrough.assign(answer=document_chain)
+        llms[llm_choice] = chain
+    return llms[llm_choice]
+
+@dataclass
+class Closure:
+    llm: str
+    def __call__(self, part, whole):
+        print(f"got message from `{self.llm}`: {part}")
+        socketio.emit("socket", {
+            "llm": self.llm,
+            "answer": whole.get("answer", "")
+        })
+
+def _get_data(messages, llm_choices):
+    jobs = []
+    pool = ThreadPoolExecutor(4)
+
+    question = messages[-1].content
+    context = get_db().as_retriever(k=1).invoke(question)
+    context_source = RunnablePassthrough.assign(context=lambda _: context)
+    
+    for llm_choice in llm_choices:
+        chain = context_source | get_llm(llm_choice)
+        print(f"Submitting task for `{llm_choice}`")
+        job = pool.submit(infer, messages, chain, Closure(llm_choice))
+        jobs.append((llm_choice, job))
+
+    answers = []
+        
+    for llm, job in jobs:
+        answer = job.result()
+        answers.append({
+            "llm": llm,
+            "answer": answer["answer"]
+        })
+    
+    return answers, context
+
+def infer(messages, chain, callback):
+    print("Starting inference for LLM")
+    payload = { "messages": messages }
+    full = None
+    for item in chain.stream(payload):
+        if full is None:
+            full = item
+        else:
+            full += item
+        if callback is not None:
+            callback(item, full)
+    return full
+
+set_state(None)
+llms = {}
+raw_llms = {}
+memory = ChatMessageHistory()
+options = { "language" : "English" }
+
 if __name__ == "__main__":
+    from flask import Flask, request, jsonify
+    from flask_cors import CORS
+    from flask_socketio import SocketIO
+    app = Flask(__name__)
+    socketio = SocketIO(app, cors_allowed_origins="*")
+    CORS(app)
+
+    @app.route('/message', methods=['POST'])
+    def get_data():
+        global state
+        if state is not None:
+            return jsonify(
+                error="Already running inference",
+                state=str(state)
+            ), 400
+        data = request.json
+        llm_choices = data.get('llms') or []
+        if len(llm_choices) == 0:
+            return jsonify(answers={})
+        message = data.get('message')
+        set_state(PendingInferenceComplete(data=data))
+        memory.add_user_message(message)
+        answers, sources = _get_data(memory.messages, llm_choices)
+        set_state(PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers }))
+        return jsonify({ "answers": answers, "sources" : [source.page_content for source in sources] })
+    
+    
+    @app.route('/selectAnswer', methods=['POST'])
+    def select_response():
+        data = request.json
+        global state
+        if type(state) is not PendingResponseChoice:
+            return jsonify(400)
+        chosen_answer = data.get('llm')
+        global memory
+        memory.add_ai_message(state.answers[chosen_answer.lower()])
+        set_state(None)
+        return jsonify(200)
+
     app.run(port=5000)

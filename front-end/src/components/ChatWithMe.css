@@ -5,28 +5,24 @@
 }
 
 .message-bubble {
-  display: flex;
-  flex-direction: column;       
+    display: flex;
+    flex-direction: column;
 }
 
 .user {
-  align-self: flex-end;
+  align-self: flex-start;
   background-color: #E6E6E6; /* Add background color for user message */
-  color: black
+  color: black;
+  flex-direction: row-reverse; /* switch message direction  */
 }
 
 .bot {
-  align-self: flex-start;
-  flex-direction: row-reverse; /* switch message direction  */
+  align-self: flex-end;
+  flex-direction: row; /* switch message direction  */
   background-color: #CA6267; /* background color for the bot message */
   color: #FFFFFF
 }
-.llama {
-  align-self: flex-start;
-  flex-direction: row-reverse; /* switch message direction  */
-  background-color: #ca626784; /* background color for the bot message */
-  color: #FFFFFF
-}
+
 .message {
   display: flex;
   width: fit-content;           
@@ -42,4 +38,81 @@ text{
   text-align: justify;          /* Make the text aligned on each side */
   margin: auto;                 /* Center the text vertically */
 }
-  
+
+.llm-container input {
+    display: none;
+    user-select: none;
+}
+
+label:hover {
+    filter: brightness(2.0);
+}
+
+.llm-container:has(label:hover) {
+    background-color: #E6E6E6;
+}
+
+.llm-container:has(input:checked) {
+    background-color: #ca626784;
+    /* border: 2px outset #DAA; */
+}
+.llm-container-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.llm-container {
+    width: 100%;
+    border-radius: 10px;
+    background-color: buttonface;
+    /* border: 2px outset buttonface; */
+    margin-bottom: 10px;
+    padding: 10px;
+    color: black;
+}
+
+.loading {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 50%;
+  }
+}
+
+.master {
+    display: flex;
+    color: black;
+    flex-direction: row;
+    height: 100%;
+    width: 80vw;
+}
+
+.master > * {
+    padding: 20px;
+}
+
+.messages-pane {
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+}
+
+.input-form {
+    display: flex;
+    align-items: stretch;
+    justify-items: stretch;
+    gap: 5px;
+}
+
+.input-form textarea {
+    flex: 1;
+}
+
+blockquote {
+    padding-left: 10px;
+    border-left: 2px solid #B6B6B6;
+}
