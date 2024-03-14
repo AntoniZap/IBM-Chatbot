@@ -1,7 +1,7 @@
 # Note - Idea no longer being worked on
 # Uploaded for proof of work, and to adapt if a site is found that allows scraping
 
-import requests
+'''import requests
 from bs4 import BeautifulSoup
 import pandas
 
@@ -28,6 +28,6 @@ for review in reviews_elements:
     review = {"rating": review_rating,
               "content": review_content}
     
-    reviews.append(review)
+    reviews.append(review)'''
 
 #src: https://www.youtube.com/watch?v=w3XcMfyUGxY
