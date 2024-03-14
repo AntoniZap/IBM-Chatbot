@@ -41,27 +41,27 @@ Download the "Datafiniti" CSV file from [here](https://data.world/datafiniti/con
 Place it in the project root driectory.
 The program will for a csv with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
 
-You need to modify `.env.template`. (no longer necessary, modify config.py instead)
-If you are using LLaMa set the `LLM` environment variable to `LLAMA` and make sure that the `LLAMA_MODEL_PATH` environment variable points to the `gguf` files corresponding to the model that you want to use.
-If you are using chatgpt, make sure you set the `LLM` environment variable to `CHATGPT` and set `OPENAI_API_KEY` to your OpenAI API key.
-If you are using AI21 llm, make sure you set the `LLM` environment variable to `AI21` and set `AI21_API_KEY` to your AI21 API key.
+You need to modify `config.py`.
+If you are using LLaMa make sure that the `LLAMA_MODEL_PATH` environment variable points to the `gguf` files corresponding to the model that you want to use.
+If you are using chatgpt, set `OPENAI_API_KEY` to your OpenAI API key.
+If you are using AI21 llm, set `AI21_API_KEY` to your AI21 API key.
 
 ## Running the Backend
 
+Run the app.py file within your IDE, or alternatively within your terminal run:
+
 ```
-. .env.template (no longer necessary)
-streamlit run ChatbotConcept.py
+python3 app.py
+```
 
 Please run the commands using bash, rather than powershell as it might not work using powershell (windows devices).
-
-```
 
 ## Running the Frontend
 
 Navigate to the `front-end` folder and setup prerequisites via:
 
 ```
-npm install`
+npm install
 ```
 
 You can then run the frontend using the command.
@@ -69,3 +69,5 @@ You can then run the frontend using the command.
 ```
 npm run start
 ```
+
+Please note that the frontend should be run in a terminal seperate from the backend.
