@@ -7,6 +7,7 @@ from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnablePassthrough
+from langchain.docstore.document import Document
 
 # ✨AI✨
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -125,11 +126,8 @@ def get_llm(llm_choice):
                 MessagesPlaceholder(variable_name="messages")
             ]
         )
-        retriever = get_db().as_retriever(k=1)
         document_chain = create_stuff_documents_chain(llm, prompt)
-        chain = RunnablePassthrough \
-            .assign(context=query_chain(retriever)) \
-            .assign(answer=document_chain)
+        chain = RunnablePassthrough.assign(answer=document_chain)
         llms[llm_choice] = chain
     return llms[llm_choice]
 
@@ -146,14 +144,18 @@ class Closure:
 def _get_data(messages, llm_choices):
     jobs = []
     pool = ThreadPoolExecutor(4)
+
+    question = messages[-1].content
+    context = get_db().as_retriever(k=1).invoke(question)
+    context_source = RunnablePassthrough.assign(context=lambda _: context)
+    
     for llm_choice in llm_choices:
-        chain = get_llm(llm_choice)
+        chain = context_source | get_llm(llm_choice)
         print(f"Submitting task for `{llm_choice}`")
         job = pool.submit(infer, messages, chain, Closure(llm_choice))
         jobs.append((llm_choice, job))
 
     answers = []
-    # sources = [doc.page_content for doc in full[0]["context"]]
         
     for llm, job in jobs:
         answer = job.result()
@@ -162,7 +164,7 @@ def _get_data(messages, llm_choices):
             "answer": answer["answer"]
         })
     
-    return answers
+    return answers, context
 
 def infer(messages, chain, callback):
     print("Starting inference for LLM")
@@ -206,9 +208,9 @@ if __name__ == "__main__":
         message = data.get('message')
         set_state(PendingInferenceComplete(data=data))
         memory.add_user_message(message)
-        answers = _get_data(memory.messages, llm_choices)
+        answers, sources = _get_data(memory.messages, llm_choices)
         set_state(PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers }))
-        return jsonify(answers)
+        return jsonify({ "answers": answers, "sources" : [source.page_content for source in sources] })
     
     
     @app.route('/selectAnswer', methods=['POST'])

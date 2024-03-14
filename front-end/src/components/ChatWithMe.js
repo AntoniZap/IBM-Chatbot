@@ -21,6 +21,7 @@ function ChatWithMe() {
     const [message, setMessage] = useState('');
     const [chatHistory, setChatHistory] = useState([]);
     const [answers, setAnswers] = useState({});
+    const [sources, setSources] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
 
     useEffect(() => {
@@ -65,7 +66,8 @@ function ChatWithMe() {
             await axios.post('/message', {message: message, llms })
                 .then(response => {
                     setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: message }]);
-                    setAnswers(Object.fromEntries(response.data.map(answer => [answer.llm, answer])));
+                    setAnswers(Object.fromEntries(response.data.answers.map(answer => [answer.llm, answer])));
+                    setSources(response.data.sources);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -98,6 +100,14 @@ function ChatWithMe() {
                         { chatHistory.map((msg, index) => <Bubble {...msg}/>) }
                         { processingUserMessage && <Bubble className="loading" sender="user" message={message}/> }
                     </div>
+                    {
+                        sources.length > 0 && (
+                            <>
+                                <h3>Sources</h3>
+                                { sources.map((source, index) => <blockquote key={index}>{source}</blockquote>) }
+                            </>
+                        )
+                    }
                     {
                         (Object.keys(answers).length > 0) && (
                             <>
