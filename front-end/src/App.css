@@ -9,7 +9,7 @@
 .App-logo {
   height: 8vmin; /* Adjust the size of the logo */
   pointer-events: none;
-  margin-right: 20px; /* Add some space between the logo and the nav links *
+  margin-right: 20px; /* Add some space between the logo and the nav links */
 }
 
 /* Remove or comment out the animation if not needed for the logo */
