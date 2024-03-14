@@ -27,21 +27,19 @@ def test_get_options():
     assert ChatbotHelper.get_options() == {"language": "English"}
 
 # 3 tests bellow can only be run provided user provides API keys
-def test_get_llm_ChatOpenAI():                                  # Check that ChatOpenAI is obtained correctly
-    os.environ['LLM'] = "CHATGPT"                               # Load 'CHATGPT' as the LLM selection
-    OPENAI_API_KEY = os.environ['OPENAI_API_KEY']
-    from langchain_openai import ChatOpenAI
-    llm = ChatbotHelper.setup_chatgpt()
-    assert isinstance(llm, ChatOpenAI)
-    del os.environ['LLM']
+# def test_get_llm_ChatOpenAI():                                  # Check that ChatOpenAI is obtained correctly
+#     os.environ['LLM'] = "CHATGPT"                               # Load 'CHATGPT' as the LLM selection
+#     from langchain_openai import ChatOpenAI
+#     llm = ChatbotHelper.setup_chatgpt()
+#     assert isinstance(llm, ChatOpenAI)
+#     del os.environ['LLM']
 
-def test_get_llm_AI21():                                     # Check that AI21 is obtained correctly
-    os.environ['LLM'] = "AI21"                               # load 'AI21' as the LLM selection
-    AI21_API_KEY = os.environ['AI21_API_KEY']
-    llm = ChatbotHelper.setup_ai21()
-    from langchain.llms import AI21
-    assert isinstance(llm, AI21)
-    del os.environ['LLM']
+# def test_get_llm_AI21():                                     # Check that AI21 is obtained correctly
+#     os.environ['LLM'] = "AI21"                               # load 'AI21' as the LLM selection
+#     llm = ChatbotHelper.setup_ai21()
+#     from langchain.llms import AI21
+#     assert isinstance(llm, AI21)
+#     del os.environ['LLM']
 
 # def test_get_llm_LLAMA():                                     # Check that LLAMA is obtained correctly
 #    os.environ['LLM'] = "LLAMA"                               # Load 'LLAMA' as the LLM selection
