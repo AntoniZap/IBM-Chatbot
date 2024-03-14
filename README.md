@@ -54,7 +54,8 @@ Run the app.py file within your IDE, or alternatively within your terminal run:
 python3 app.py
 ```
 
-Please run the commands using bash, rather than powershell as it might not work using powershell (windows devices).
+Please note (for Windows devices) commands should be run via Bash.
+Please refrain from using of PowerShell as there are some errors that may occur.
 
 ## Running the Frontend
 
@@ -67,7 +68,7 @@ npm install
 You can then run the frontend using the command.
 
 ```
-npm run start
+npm start
 ```
 
 Please note that the frontend should be run in a terminal seperate from the backend.
