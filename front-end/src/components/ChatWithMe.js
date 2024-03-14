@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Bot from '../assets/bot.png';
 import User from '../assets/user.png';
+import RatingLLms from './RatingLLms.js';
 import './ChatWithMe.css'; // Import the CSS file
 
 const mock = [{"answer":"\nAmazon Kindle E-Reader 6\" Wifi (8th Generation, 2016)","llm":"LLaMa"}, {"answer":"\nAmazon Kindle E-Reader 6\" Wifi (8th Generation, 2016)","llm":"AI21"}];
 
-import io from 'socket.io-client';
+import io from 'socket.io-client'
 const socket = io('http://localhost:5000');
 const validLLMs = ["llama", "chatgpt", "ai21"];
 
@@ -22,6 +23,7 @@ function ChatWithMe() {
     const [chatHistory, setChatHistory] = useState([]);
     const [answers, setAnswers] = useState({});
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
+    const [llmRatings, setLlmRatings] = useState({});
 
     useEffect(() => {
         socket.on("socket", (data) => {
@@ -75,6 +77,13 @@ function ChatWithMe() {
         }
         setProcessingUserMessage(() => false);
     };
+
+    const handleRatingChange = (llm, rating) => {
+        setLlmRatings(prevState => ({
+          ...prevState,
+          [llm]: rating
+        }));
+      };
     
     return (
         <div className="master">
@@ -116,6 +125,9 @@ function ChatWithMe() {
                                                      ? <span style={{color: "red"}}>No data!</span>
                                                      : (msg.answer.trim() || <em>(Nothing was returned 🕳️)</em>)}
                                                 </label>
+                                                <div>
+                                                    <RatingLLms llm={msg.llm} onRatingChange={handleRatingChange} />
+                                                </div>
                                             </div>
                                         ))
                                     }
