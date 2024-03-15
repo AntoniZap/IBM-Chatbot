@@ -4,6 +4,7 @@
 import ChatbotHelper
 import config
 import os
+import tempfile
 
 # Document loading and the link
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -24,6 +25,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 from local import resolve
 from csv_to_langchain import CSVLoader
+from app import get_datafiniti_documents, populate_db
 
 os.environ['LLM'] = 'TESTING'
 
@@ -163,13 +165,23 @@ def test_get_memory_unique():                               # Check that calling
 
 
 def test_csv_loader_can_load_and_rename_metadata():
-   loader = CSVLoader(
-       "Test_Dataset.csv",
-       metadata_columns=["reviews.rating", "reviews.date"],
-       metadata_column_names=["rating", "date"]
-   )
-   documents = loader.load()
+   documents = get_datafiniti_documents("Test_Dataset.csv")
    assert len(documents) > 0, "no documents were loaded"
    for document in documents:
        assert document.metadata.get("rating") is not None, "rating not exposed as metadata"
        assert document.metadata.get("date") is not None, "date not exposed as metadata"
+
+def test_document_persistence_works():
+   with tempfile.TemporaryDirectory() as persist_directory:
+       db = Chroma(
+          persist_directory=persist_directory,
+          embedding_function=SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+       )
+       documents = get_datafiniti_documents("Test_Dataset.csv")
+       r1 = populate_db(db, documents[:5])
+       assert r1.existing_documents == 0, "no documents should exist in a fresh database"
+       assert r1.new_documents == len(documents), "not all documents were added"
+       r2 = populate_db(db, documents[:5])
+       assert r2.existing_documents == len(documents), "all documents should exist due to the cache"
+       assert r2.new_documents == 0, "despite no new documents being added, DB was mutated"
+

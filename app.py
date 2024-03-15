@@ -41,7 +41,7 @@ class PendingResponseChoice:
     A mapping from llm names → answers
     """
 
-def get_datafiniti_documents(file_name: str = "Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv") -> List[Document]:
+def get_datafiniti_documents(file_name: str) -> List[Document]:
     loader = CSVLoader(
        file_name,
        metadata_columns=["reviews.rating", "reviews.date"],
@@ -52,14 +52,28 @@ def get_datafiniti_documents(file_name: str = "Datafiniti_Amazon_Consumer_Review
 
 @functools.cache
 def get_db():
-    documents = get_datafiniti_documents("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")
-    
+    documents = get_datafiniti_documents("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")[:10]
     print("Loading persisted ChromaDB data store")
     db = Chroma(
         persist_directory=".chroma_db",
         embedding_function=SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
     )
+    populate_db(db, documents)
+    return db
 
+@dataclass
+class PopulateDBResult:
+    new_documents: int
+    """
+    The number of documents that had to be added.
+    """
+    
+    existing_documents: int
+    """
+    The number of documents that existed already in the database.
+    """
+
+def populate_db(db: Chroma, documents: List[Document]) -> PopulateDBResult:
     print("Figuring out which documents exist already")
     persisted_documents = db.get()
     existing_documents = set()
@@ -77,8 +91,8 @@ def get_db():
         print(f"Added {len(new_documents)} documents")
     else:
         print(f"All {len(new_documents)} are already in the database")
-        
-    return db
+    return PopulateDBResult(new_documents=len(new_documents),
+                            existing_documents=len(existing_documents))
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
