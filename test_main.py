@@ -180,8 +180,42 @@ def test_document_persistence_works():
        documents = get_datafiniti_documents("Test_Dataset.csv")
        r1 = populate_db(db, documents[:5])
        assert r1.existing_documents == 0, "no documents should exist in a fresh database"
-       assert r1.new_documents == len(documents), "not all documents were added"
+       assert r1.new_documents == 5, "not all documents were added"
        r2 = populate_db(db, documents[:5])
-       assert r2.existing_documents == len(documents), "all documents should exist due to the cache"
+       assert r2.existing_documents == 5, "all documents should exist due to the cache"
        assert r2.new_documents == 0, "despite no new documents being added, DB was mutated"
+       r2 = populate_db(db, documents)
+       assert r2.existing_documents == 5, "the first five documents we added were ignored"
+       assert r2.new_documents == len(documents) - 5, "wrong number of documents added"
 
+
+def test_metadata_update_without_reindex():
+   """
+   When we want to expose new metadata fields on a large amount of data, it
+   is more efficient to adopt an approach that doesnt involve reindexing all the page contents.
+   This test ensures that the populate_db function works like that
+   """
+   
+   with tempfile.TemporaryDirectory() as persist_directory:
+       db = Chroma(
+          persist_directory=persist_directory,
+          embedding_function=SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+       )
+       documents = get_datafiniti_documents("Test_Dataset.csv")
+       modified_documents = []
+       for document in documents:
+          metadata = { **document.metadata }
+          del metadata["rating"]
+          modified_document = Document(page_content=document.page_content, metadata=metadata)
+          modified_documents.append(modified_document)
+       r1 = populate_db(db, modified_documents)
+       assert r1.updated_documents == 0, "no existing documents should have been updated"
+       assert r1.existing_documents == 0, "no documents should exist in a fresh database"
+       assert r1.new_documents == len(documents), "not all documents were added"
+       for metadata in db.get()["metadatas"]:
+          assert metadata.get("rating") is None, "rating metadata should not exist until later part of test!"
+       r2 = populate_db(db, documents)
+       assert r2.new_documents == 0, "no new documents should have been added in update operation"
+       assert r2.updated_documents > 0, "no documents had their metadata updated"
+       for metadata in db.get()["metadatas"]:
+          assert metadata.get("rating") is not None, "metadata update was not successful!"

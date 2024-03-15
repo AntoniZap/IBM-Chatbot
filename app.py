@@ -1,5 +1,7 @@
 import os
 import os.path
+import itertools
+import uuid
 
 # Document loading and the link
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -47,7 +49,7 @@ def get_datafiniti_documents(file_name: str) -> List[Document]:
 
 @functools.cache
 def get_db():
-    documents = get_datafiniti_documents("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")[:10]
+    documents = get_datafiniti_documents("_Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")
     print("Loading persisted ChromaDB data store")
     db = Chroma(
         persist_directory=".chroma_db",
@@ -58,6 +60,11 @@ def get_db():
 
 @dataclass
 class PopulateDBResult:
+    updated_documents: int
+    """
+    The number of documents that had to have their metadata updated
+    """
+    
     new_documents: int
     """
     The number of documents that had to be added.
@@ -69,35 +76,39 @@ class PopulateDBResult:
     """
 
 def populate_db(db: Chroma, documents: List[Document]) -> PopulateDBResult:
-    print("Figuring out which documents exist already")
     persisted_documents = db.get()
-    existing_documents = {
-        (metadata["source"], metadata["row"]) : (id, metadata)
-        for id, metadata in zip(persisted_documents["ids"], persisted_documents["metadatas"])
-    }
 
-    new_documents = []
+    print("Figuring out which documents exist already")
+    existing_documents = set((metadata["source"], metadata["row"]) for metadata in persisted_documents["metadatas"])
+    document_map = {(document.metadata["source"], document.metadata["row"]) : document for document in documents}
+    new_documents = [document_map[key] for key in set(document_map.keys()).difference(existing_documents)]
+    
     new_metadata_ids = []
     new_metadata_metadatas = []
-    for document in documents:
-        key = (document.metadata["source"], document.metadata["row"])
+    for id, metadata in zip(persisted_documents["ids"], persisted_documents["metadatas"]):
+        key = (metadata["source"], metadata["row"])
         try:
-            id, metadata = existing_documents.get(key)
-        except TypeError:
-            new_documents.append(document)
+            parent_document = document_map[key]
+            if parent_document.metadata != metadata:
+                new_metadata_ids.append(id)
+                new_metadata_metadatas.append(parent_document.metadata)
+        except KeyError:
+            print(f"document {key} does not has an invalid parent, not considering for metadata update")
             continue
-        if metadata != document.metadata:
-            new_metadata_ids.append(id)
-            new_metadata_metadatas.append(document.metadata)
 
     if len(new_metadata_ids) > 0:
         print(f"Need to update the metadata for {len(new_metadata_ids)} documents")
         if config.FEEDBOT_IGNORE_NEW_DOCUMENTS:
             print("\tFEEDBOT_IGNORE_NEW_DOCUMENTS is set, skipping…")
         else:
-            db._client \
-              .get_collection("langchain") \
-              .update(ids=new_metadata_ids, metadatas=new_metadata_metadatas)
+            i = 0
+            while i < len(new_metadata_ids):
+                db._client \
+                  .get_collection("langchain") \
+                  .update(ids=new_metadata_ids[i:i+5000],
+                          metadatas=new_metadata_metadatas[i:i+5000])
+                i += 5000
+                print(f"Hit {i} document mark…")
     else:
         print(f"No existing document metadata needs to be changed")
 
@@ -109,12 +120,19 @@ def populate_db(db: Chroma, documents: List[Document]) -> PopulateDBResult:
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
             split_documents = text_splitter.split_documents(new_documents)
             print(f"Split {len(new_documents)} documents. Adding to Chromadb…")
-            db.add_documents(split_documents)
+            i = 0
+            while i < len(split_documents):
+                db.add_documents(split_documents[i:i+5000])
+                i += 5000
+                print(f"Hit {i} document mark…")
             print(f"Added {len(new_documents)} documents to ChromaDB")
     else:
         print(f"All {len(new_documents)} are already in the database")
-    return PopulateDBResult(new_documents=len(new_documents),
-                            existing_documents=len(existing_documents))
+    return PopulateDBResult(
+        updated_documents=len(new_metadata_ids),
+        new_documents=len(new_documents),
+        existing_documents=len(existing_documents)
+    )
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
@@ -243,8 +261,6 @@ llms = {}
 raw_llms = {}
 memory = ChatMessageHistory()
 options = { "language" : "English" }
-
-get_db()
 
 if __name__ == "__main__":
     from flask import Flask, request, jsonify
