@@ -1,9 +1,7 @@
 import os
 import os.path
-import shutil
 
 # Document loading and the link
-from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnablePassthrough
@@ -13,7 +11,6 @@ from langchain.docstore.document import Document
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ChatMessageHistory
 
 # Our own stuff
@@ -22,11 +19,9 @@ from local import resolve
 import config
 
 import functools
-from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Iterator, List, Optional, Union
 from dataclasses import dataclass, field
-import time
 import datetime
 
 @dataclass
@@ -76,19 +71,46 @@ class PopulateDBResult:
 def populate_db(db: Chroma, documents: List[Document]) -> PopulateDBResult:
     print("Figuring out which documents exist already")
     persisted_documents = db.get()
-    existing_documents = set()
-    for metadata in persisted_documents["metadatas"]:
-        existing_documents.add((metadata["source"], metadata["row"]))
-    new_documents = [document for document in documents
-                     if (document.metadata["source"], document.metadata["row"])
-                     not in existing_documents]
+    existing_documents = {
+        (metadata["source"], metadata["row"]) : (id, metadata)
+        for id, metadata in zip(persisted_documents["ids"], persisted_documents["metadatas"])
+    }
+
+    new_documents = []
+    new_metadata_ids = []
+    new_metadata_metadatas = []
+    for document in documents:
+        key = (document.metadata["source"], document.metadata["row"])
+        try:
+            id, metadata = existing_documents.get(key)
+        except TypeError:
+            new_documents.append(document)
+            continue
+        if metadata != document.metadata:
+            new_metadata_ids.append(id)
+            new_metadata_metadatas.append(document.metadata)
+
+    if len(new_metadata_ids) > 0:
+        print(f"Need to update the metadata for {len(new_metadata_ids)} documents")
+        if config.FEEDBOT_IGNORE_NEW_DOCUMENTS:
+            print("\tFEEDBOT_IGNORE_NEW_DOCUMENTS is set, skipping…")
+        else:
+            db._client \
+              .get_collection("langchain") \
+              .update(ids=new_metadata_ids, metadatas=new_metadata_metadatas)
+    else:
+        print(f"No existing document metadata needs to be changed")
 
     if len(new_documents) > 0:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
-        split_documents = text_splitter.split_documents(new_documents)
-        print(f"Split {len(new_documents)} documents")
-        db.add_documents(split_documents)
-        print(f"Added {len(new_documents)} documents")
+        print(f"Need to split and add {len(new_documents)} to ChomaDB")
+        if config.FEEDBOT_IGNORE_NEW_DOCUMENTS:
+            print("\tFEEDBOT_IGNORE_NEW_DOCUMENTS is set, skipping…")
+        else:
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
+            split_documents = text_splitter.split_documents(new_documents)
+            print(f"Split {len(new_documents)} documents. Adding to Chromadb…")
+            db.add_documents(split_documents)
+            print(f"Added {len(new_documents)} documents to ChromaDB")
     else:
         print(f"All {len(new_documents)} are already in the database")
     return PopulateDBResult(new_documents=len(new_documents),
@@ -101,15 +123,15 @@ def setup_llama():
     from langchain_community.llms import LlamaCpp
     from langchain.callbacks.manager import CallbackManager
     from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-    from llama_cpp import LlamaCache
+    from llama_cpp.llama_cache import LlamaDiskCache
     callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
     llm = LlamaCpp(
         model_path= os.getenv('LLAMA_MODEL_PATH'),
-        callback_manager = callback_manager,
-        verbose = True,
+        # callback_manager = callback_manager,
+        verbose = False,
         n_ctx=1024,
     )
-    llm.client.set_cache(LlamaCache())
+    llm.client.set_cache(LlamaDiskCache())
     return llm
 
 def setup_chatgpt():
@@ -221,6 +243,8 @@ llms = {}
 raw_llms = {}
 memory = ChatMessageHistory()
 options = { "language" : "English" }
+
+get_db()
 
 if __name__ == "__main__":
     from flask import Flask, request, jsonify
