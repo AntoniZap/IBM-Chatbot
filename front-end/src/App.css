@@ -9,7 +9,7 @@
 .App-logo {
   height: 8vmin; /* Adjust the size of the logo */
   pointer-events: none;
-  margin-right: 20 px; /* Add some space between the logo and the nav links */
+  margin-right: 20px; /* Add some space between the logo and the nav links */
 }
 
 /* Remove or comment out the animation if not needed for the logo */
@@ -43,6 +43,26 @@
   font-weight: bold; /* Make the font bold */
   padding: 0.5rem 1rem; /* Padding for larger click area */
   display: inline-block; /* Treat the links as inline-block elements */
+}
+
+.dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  width: 200px;
+  z-index: 100;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 .app-diagonal-gradient {
