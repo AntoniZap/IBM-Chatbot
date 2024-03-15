@@ -41,10 +41,18 @@ class PendingResponseChoice:
     A mapping from llm names → answers
     """
 
+def get_datafiniti_documents(file_name: str = "Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv") -> List[Document]:
+    loader = CSVLoader(
+       file_name,
+       metadata_columns=["reviews.rating", "reviews.date"],
+       metadata_column_names=["rating", "date"]
+    )
+    documents = loader.load()
+    return documents
+
 @functools.cache
 def get_db():
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
-    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()
+    documents = get_datafiniti_documents("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")
     
     print("Loading persisted ChromaDB data store")
     db = Chroma(
@@ -62,6 +70,7 @@ def get_db():
                      not in existing_documents]
 
     if len(new_documents) > 0:
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
         split_documents = text_splitter.split_documents(new_documents)
         print(f"Split {len(new_documents)} documents")
         db.add_documents(split_documents)

@@ -25,6 +25,8 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from local import resolve
 from csv_to_langchain import CSVLoader
 
+os.environ['LLM'] = 'TESTING'
+
 #Following code, that is commented out can only be run with a local machine
 #You need to provide AI21 key, OPENAI key, LLAMA path in config.py
 
@@ -160,3 +162,14 @@ def test_get_memory_unique():                               # Check that calling
     
 
 
+def test_csv_loader_can_load_and_rename_metadata():
+   loader = CSVLoader(
+       "Test_Dataset.csv",
+       metadata_columns=["reviews.rating", "reviews.date"],
+       metadata_column_names=["rating", "date"]
+   )
+   documents = loader.load()
+   assert len(documents) > 0, "no documents were loaded"
+   for document in documents:
+       assert document.metadata.get("rating") is not None, "rating not exposed as metadata"
+       assert document.metadata.get("date") is not None, "date not exposed as metadata"
