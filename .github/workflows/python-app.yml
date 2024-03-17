@@ -7,6 +7,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,17 +23,17 @@ jobs:
       with:
         python-version: "3.10"
 
-    - name: Chache Python modules
-      id: chache
+    - name: Cache Python modules
+      id: cache
       uses: actions/cache@v2
       env:
         cache-name: cache-node-modules
       with:
-        path: ~/.chache/pip
+        path: ~/.cache/pip
         key: ${{ runner.os }}-build-${{ env. cache-name }}-${{ hashFiles('**/package-lock.json') }}
 
     - name: Install dependencies
-      if: steps.chache.outputs.cache-hit != 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         python3 -m pip install flake8 pytest
         python3 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
