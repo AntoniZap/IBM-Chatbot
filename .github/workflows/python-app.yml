@@ -16,11 +16,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
+
+    - name: Chache Python modules
+      id: chache
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.chache/pip
+        key: ${{ runner.os }}-build-${{ env. cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
     - name: Install dependencies
+      if: steps.chache.outputs.cache-hit != 'true'
       run: |
         python3 -m pip install flake8 pytest
         python3 -m pip install torch --index-url https://download.pytorch.org/whl/cpu

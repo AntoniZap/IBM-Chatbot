@@ -13,11 +13,11 @@ An Overview of Project 30 -
  - Jaedon Paget (pagetj@tcd.ie) - ICS
 
 2️⃣ Second Years
- - Sean Conway (SECONWAY@tcd.ie) -
- - Emmelia Klefti (kleftie@tcd.ie) -
- - Nicholas Horvat (horvatn@tcd.ie) -
- - Lorca Brannigan (Lbrannig@tcd.ie) -
- - Dylan Martin (martindy@tcd.ie) -
+ - Sean Conway (SECONWAY@tcd.ie) - ICS
+ - Emmelia Klefti (kleftie@tcd.ie) - ICS
+ - Nicholas Horvat (horvatn@tcd.ie) - ICS
+ - Lorca Brannigan (Lbrannig@tcd.ie) - CSB
+ - Dylan Martin (martindy@tcd.ie) - ICS
 
 # ibm-sweng
 
@@ -37,24 +37,18 @@ pip3 install langchain_openai
 Failing to install torch the way described above may result in your VENV being populated with NVIDIA drivers that you likely do not need.
 If you do have an nvidia GPU, feel free to ommit the explicit torch install, as you may be able to run the code faster with CUDA.
 
-Download the "Datafiniti" CSV file from [here](https://data.world/datafiniti/consumer-reviews-of-amazon-products).
-Place it in the project root driectory.
+To get a sample of data download the "Datafiniti" CSV file from [here](https://data.world/datafiniti/consumer-reviews-of-amazon-products).
+Place it in the project root directory.
 The program will for a csv with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
 
-You need to modify `.env.template`. (no longer necessary, modify config.py instead)
-If you are using LLaMa set the `LLM` environment variable to `LLAMA` and make sure that the `LLAMA_MODEL_PATH` environment variable points to the `gguf` files corresponding to the model that you want to use.
-If you are using chatgpt, make sure you set the `LLM` environment variable to `CHATGPT` and set `OPENAI_API_KEY` to your OpenAI API key.
-If you are using AI21 llm, make sure you set the `LLM` environment variable to `AI21` and set `AI21_API_KEY` to your AI21 API key.
+In order to be able to chat with the bot, user will need to provide a way to connect with an LLM - either API key, or path.
+API keys for GPT and AI21 can be inserted in the program. Instruction on how to find them is available once application is ran. 
+Please modify .env.template to put LLAMA path if you wish to use LLAMA LLM. 
 
 ## Running the Backend
 
-```
-. .env.template (no longer necessary)
-streamlit run ChatbotConcept.py
-
-Please run the commands using bash, rather than powershell as it might not work using powershell (windows devices).
-
-```
+You can run the app.py including .env.template which will include the environment variables for LLMs and others or
+you can provide AI21 and GPT keys while the app will be running. 
 
 ## Running the Frontend
 
