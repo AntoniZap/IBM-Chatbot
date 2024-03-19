@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Bot from '../assets/bot.png';
 import User from '../assets/user.png';
+import ExampleQuestions from '../assets/ExampleQuestions.png'; // Import the ExampleQuestions.png image
 import RatingLLms from './RatingLLms.js';
 import './ChatWithMe.css'; // Import the CSS file
 
@@ -25,7 +26,7 @@ function ChatWithMe() {
     const [sources, setSources] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
     const [llmRatings, setLlmRatings] = useState({});
-    const [showExampleQuestions, setShowExampleQuestions] = useState(true); // New state to control example questions visibility
+    const [showImage, setShowImage] = useState(true); // New state for showing image
 
     useEffect(() => {
         socket.on("socket", (data) => {
@@ -40,14 +41,12 @@ function ChatWithMe() {
 
     const handleInputChange = (event) => {
       setMessage(event.target.value);
-      if (showExampleQuestions) {
-          setShowExampleQuestions(false); // Hide example questions when user starts typing
-      }
     }
 
     const handleSendMessage = async (event) => {
         event.preventDefault();
         setProcessingUserMessage(() => true);
+        setShowImage(false); // Hide image when sending message
         try {
             if (Object.keys(answers).length === 0) {
                 // no LLM response to select, proceed.
@@ -89,22 +88,25 @@ function ChatWithMe() {
           ...prevState,
           [llm]: rating
         }));
-      };
+    };
     
     return (
         <div className="master">
-            <div className="enabled-llms">
-                <h2>Enabled LLMs</h2>
-                <p>These LLMs will be included in the response</p>
-                {validLLMs.map((ai, index) => (
-                    <div key={`enabled-llm.${ai}.${index}`}>
-                        <label><input value={ai} type="checkbox" name="g2"/> {ai}</label>
-                        <br/>
-                    </div>
-                ))}
-                <br/>
+            <div>
+                <div>
+                    <h2>Enabled LLMs</h2>
+                    <p>These LLMs will be included in the response</p>
+                    {validLLMs.map((ai, index) => (
+                        <div key={`enabled-llm.${ai}.${index}`}>
+                            <label><input value={ai} type="checkbox" name="g2"/> {ai}</label>
+                            <br/>
+                        </div>
+                    ))}
+                    <br/>
+                </div>
             </div>
             <div className="messages-pane">
+                {showImage && <img src={ExampleQuestions} alt="Example Questions" />} {/* Image shown before message sent */}
                 <div style={{flex: "1 1 0", overflow: "scroll"}}>
                     <div className="message-bubble">
                         { chatHistory.map((msg, index) => <Bubble {...msg}/>) }
@@ -152,19 +154,6 @@ function ChatWithMe() {
                     {" "}
                     <input type="submit" disabled={processingUserMessage} value="→"/>
                 </form>
-            </div>
-            <div className="example-questions">
-                {showExampleQuestions && ( // Display example questions only if showExampleQuestions is true
-                    <div>
-                        <h2>Example Questions</h2>
-                        <p>Try asking one of these questions:</p>
-                        <ul>
-                            <li>Example Question 1</li>
-                            <li>Example Question 2</li>
-                            <li>Example Question 3</li>
-                        </ul>
-                    </div>
-                )}
             </div>
         </div>
     );
