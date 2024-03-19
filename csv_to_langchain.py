@@ -83,7 +83,7 @@ class CSVLoader(BaseLoader):
                 text = review.get('reviews.text') or ''
                 content = f"name: {name}\ntext: {text}"
                 source = review[self.source_column] if self.source_column in review else self.file_path
-                metadata = { "source": source, "row": row }
+                metadata = { "name" : name, "source": source, "row": row }
                 if self.metadata_columns is not None:
                     if self.metadata_column_names is not None:
                         mapping = {}

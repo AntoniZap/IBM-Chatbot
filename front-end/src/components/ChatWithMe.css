@@ -113,6 +113,15 @@ label:hover {
 }
 
 blockquote {
-    padding-left: 10px;
+    padding-left: 20px;
     border-left: 2px solid #B6B6B6;
+}
+
+td span {
+    background-color: #0001;
+    padding: 2px;
+}
+
+table {
+    
 }

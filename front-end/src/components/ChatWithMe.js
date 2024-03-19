@@ -17,6 +17,21 @@ const Bubble = ({ sender, message, className, ...props }) =>
     <img src={sender === 'user' ? User : Bot} alt={`${sender} icon`} className="user-icon" />
 </div>
 
+const Answer = ({ type, ...rest }) => {
+    if (type == "regular") {
+        return rest["answer"];
+    } else if (type == "tabular") {
+        return <table>
+                   <tr>
+                       {rest.column_names.map(name => <td><span>{name}</span></td>)}
+                   </tr>
+                   {rest.results.map(result => <tr>{result.map(r => <td><span>{r}</span></td>)}</tr>)}
+               </table>
+    } else {
+        return rest.answer;
+    }
+}
+
 function ChatWithMe() {
     axios.defaults.baseURL = 'http://localhost:5000';
     const [message, setMessage] = useState('');
@@ -113,7 +128,11 @@ function ChatWithMe() {
                         sources.length > 0 && (
                             <>
                                 <h3>Sources</h3>
-                                { sources.map((source, index) => <blockquote key={index}>{source}</blockquote>) }
+                                { sources.map((source, index) => (<>
+                                    <p><strong>Product:</strong> {source.productName}<br/>
+                                    <strong>Rating:</strong> {source.rating ?? "N/A"}</p>
+                                    <blockquote key={index}>{source.pageContent}</blockquote>
+                                </>)) }
                             </>
                         )
                     }
@@ -131,9 +150,7 @@ function ChatWithMe() {
                                                 <label>
                                                     <h4>{msg.llm}</h4>
                                                     <input defaultChecked={index == 0} value={msg.llm} id={"..."+index} type="radio" name="g1"/>
-                                                    {msg.answer === undefined
-                                                     ? <span style={{color: "red"}}>No data!</span>
-                                                     : (msg.answer.trim() || <em>(Nothing was returned 🕳️)</em>)}
+                                                    <span style={{whiteSpace: "pre-line"}}>{<Answer {...msg}/>}</span>
                                                 </label>
                                                 <div>
                                                     <RatingLLms llm={msg.llm} onRatingChange={handleRatingChange} />
