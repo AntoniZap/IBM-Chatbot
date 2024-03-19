@@ -2,14 +2,13 @@ import re
 import sqlite3
 import json
 from langchain_core.messages import AIMessage
+from langchain_core.language_models.llms import LLM
 from llm import get_raw_llm
 from db import get_db
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
 from typing import Any, Dict, Iterator, List, Optional, Union
 from dataclasses import dataclass
-
-example_id = '1290de00-e026-11ee-a273-744ca147f17b'
 
 def inject_documents(connection: sqlite3.Connection):
     """
@@ -53,8 +52,6 @@ Date varchar(255)
               for id, metadata in zip(ids, metadatas)]
     connection.executemany("INSERT INTO reviews VALUES (?, ?, ?, ?)", values)
     connection.commit()
-    # sem = SemanticMatch(embeddings, texts)
-    # con = connection
 
 def explain_prompt(question, query, result):
     return f"""The "Reviews" database has the following fields
@@ -128,21 +125,34 @@ The question is: '{question}' (INCLUDE ONLY A BRIEF DESCRIPTION AFTER THE EXPLAN
 """
 
 class QueryGenerator:
-    def __init__(self, question, llm):
+    def __init__(self, question: str, llm: LLM):
         self.question = question
         self.llm = llm
 
-    def annotate(self, query, result):
+    def annotate(self, query: str, result: List[Any]) -> List[str]:
+        """
+        After a successful invocation of QueryGenerator.generate, use this to generate descriptions for
+        each column returned in the result. This will give the LLM information about the question asked,
+        the SQL query generated, and a row that was returned. It will use this data to derive column names
+        for each column in the result.
+
+        :param query: The SQL query
+        :param result: A single row from the SQL query result
+        """
+        
         prompt = explain_prompt(question=self.question, result=result, query=query)
         answer = self.llm.invoke(prompt)
         answer = answer.content if type(answer) is AIMessage else answer
         answer = answer.split("```")[0]
         return json.loads(f"[{answer}]" )
     
-    def patch(self, query, error):
+    def patch(self, query: str, error: str):
         """
         After an SQL query created by QueryGenerator.generate fails, use this to attempt to generate
         a query that actually works.
+
+        :param query: The SQL query
+        :param error: A message indicating the error that the LLM should try to fix
         """
         
         prompt = f"""{initial_prompt(question=self.question)}{query}
@@ -173,6 +183,8 @@ This doesn't work in sqlite3 due to the error: "{error}". A version that works i
         answer = answer.content if type(answer) is AIMessage else answer
         try:
             answer, description = answer.split("```", 1)
+            # strip the rest of the description in case LLM returns more than it should
+            description, *_ = description.split("```", 1)
         except ValueError as e:
             description = ""
         answer = answer.split(";")[0]
@@ -185,11 +197,35 @@ This doesn't work in sqlite3 due to the error: "{error}". A version that works i
 
 @dataclass
 class AggregationRAGResult:
+    """
+    Represents the output from the AggregationRAG.answer function.
+    """
+    
     column_names: List[str]
+    """
+    The name of each column in the table
+    """
+    
     results: List[List[str]]
+    """
+    Columns returned by the SQL query. This is always non-empty.
+    """
+    
     description: str
+    """
+    An english description of what the results of the query generated should be.
+    """
+    
     query: str
+    """
+    The SQL query that ended up being generated to answer the question.
+    """
+    
     failed_attempts: List[str]
+    """
+    A list of the SQL queries that resulted in errors that the LLM attempted to fix.
+    Only useful for debugging purposes.
+    """
 
 class LLMUnreliableException(Exception):
     pass
@@ -198,13 +234,24 @@ class NoQueryGenerated(LLMUnreliableException):
     pass
 
 class AggregationRAG:
-    def __init__(self, llm, verbose=False):
+    """
+    This attempts to use SQL based RAG to answer aggregation questions about the product review
+    databse as a whole
+    """
+        
+    def __init__(self, llm: LLM, verbose=False):
         self.llm = llm
         self.connection = sqlite3.connect(":memory:")
         self.verbose = verbose
         inject_documents(self.connection)
         
     def answer(self, question: str) -> Optional[AggregationRAGResult]:
+        """
+        Attempt to answer the question by accessing the global document database.
+        
+        :param question: The question
+        """
+        
         query_generator = QueryGenerator(question, self.llm)
         failed_attempts = []
         attempts = 3
