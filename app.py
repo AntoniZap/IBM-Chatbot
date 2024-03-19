@@ -79,7 +79,7 @@ def _get_data(messages, llm_choices):
 def infer(messages, llm, chain, callback):
     print("Running pre-inference step")
     try:
-        agg = AggregationRAG(llm)
+        agg = AggregationRAG(llm, verbose=True)
         result = agg.answer(messages[-1])
         if result is not None:
             full = { **result.__dict__, "type" : "tabular" }
@@ -87,7 +87,7 @@ def infer(messages, llm, chain, callback):
         else:
             print("got empty result, but things were otherwise okay")
     except LLMUnreliableException as e:
-        print("fuck llms mehn")
+        print(f"LLM not reliable: {e}")
     print("Starting inference for LLM")
     payload = { "messages": messages }
     full = None

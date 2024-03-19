@@ -198,9 +198,10 @@ class NoQueryGenerated(LLMUnreliableException):
     pass
 
 class AggregationRAG:
-    def __init__(self, llm):
+    def __init__(self, llm, verbose=False):
         self.llm = llm
         self.connection = sqlite3.connect(":memory:")
+        self.verbose = verbose
         inject_documents(self.connection)
         
     def answer(self, question: str) -> Optional[AggregationRAGResult]:
@@ -216,6 +217,8 @@ class AggregationRAG:
                     answer, description = query_generator.generate()
                 except NoQueryGenerated:
                     continue
+            if self.verbose:
+                print("SQL Query:", answer)
             try:
                 results = list(self.connection.execute(answer))
                 if len(results) > 0:
@@ -229,7 +232,6 @@ class AggregationRAG:
                     )
                 else:
                     return None
-                
             except Exception as e:
                 error, fix = str(e), answer
                 failed_attempts.append(fix)
