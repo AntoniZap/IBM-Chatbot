@@ -89,7 +89,12 @@ def infer(messages, llm, chain, callback):
     except LLMUnreliableException as e:
         print(f"LLM not reliable: {e}")
     print("Starting inference for LLM")
-    payload = { "messages": messages }
+    payload = {
+        "messages": [
+            *messages,
+            SystemMessage(content="No tabular output could be generated. Use the sources provided to answer the question.")
+        ]
+    }
     full = None
     for item in chain.stream(payload):
         if full is None:
