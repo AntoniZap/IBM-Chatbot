@@ -52,7 +52,7 @@ label:hover {
     background-color: #E6E6E6;
 }
 
-.llm-container:has(input:checked) {
+.llm-container:has(input[name="g1"]:checked) {
     background-color: #ca626784;
     /* border: 2px outset #DAA; */
 }
@@ -113,6 +113,15 @@ label:hover {
 }
 
 blockquote {
-    padding-left: 10px;
+    padding-left: 20px;
     border-left: 2px solid #B6B6B6;
+}
+
+td span {
+    background-color: #0001;
+    padding: 2px;
+}
+
+table {
+    
 }
