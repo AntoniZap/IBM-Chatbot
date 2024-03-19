@@ -46,17 +46,6 @@ def getUserRating(User_id, llm):
     result = collection.find_one({"User_id" :User_id,"LLM" : llm})
     return result["Rating"]
 
-def getID():
-    num = random.random()
-    return num
-
-addRating3( 1, "OpenAI", 2, "AI21", 5, "Llama", 3)
-#addRating1(2, "OpenAI", 1)
-#addRating1(3, "OpenAI", 2)
-#addRating1(4, "OpenAI", 5)
-
-#print(getUserRating(1, "AI21"))
-#print(getAverageRating("OpenAI"))
 
 
 
