@@ -27,7 +27,9 @@ from local import resolve
 import streamlit as st
 
 
-
+os.environ['LLM'] = "ChatGPT"
+os.environ['OPENAI_API_KEY'] = ''
+os.environ['AI21_API_KEY'] = ''
 
 global db
 @st.cache_resource()
