@@ -25,6 +25,7 @@ function ChatWithMe() {
     const [sources, setSources] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
     const [llmRatings, setLlmRatings] = useState({});
+    const [showExampleQuestions, setShowExampleQuestions] = useState(true); // New state to control example questions visibility
 
     useEffect(() => {
         socket.on("socket", (data) => {
@@ -39,6 +40,9 @@ function ChatWithMe() {
 
     const handleInputChange = (event) => {
       setMessage(event.target.value);
+      if (showExampleQuestions) {
+          setShowExampleQuestions(false); // Hide example questions when user starts typing
+      }
     }
 
     const handleSendMessage = async (event) => {
@@ -89,21 +93,18 @@ function ChatWithMe() {
     
     return (
         <div className="master">
-            <div>
-                <div>
-                    <h2>Enabled LLMs</h2>
-                    <p>These LLMs will be included in the response</p>
-                    {validLLMs.map((ai, index) => (
-                        <div key={`enabled-llm.${ai}.${index}`}>
-                            <label><input value={ai} type="checkbox" name="g2"/> {ai}</label>
-                            <br/>
-                        </div>
-                    ))}
-                    <br/>
-                </div>
+            <div className="enabled-llms">
+                <h2>Enabled LLMs</h2>
+                <p>These LLMs will be included in the response</p>
+                {validLLMs.map((ai, index) => (
+                    <div key={`enabled-llm.${ai}.${index}`}>
+                        <label><input value={ai} type="checkbox" name="g2"/> {ai}</label>
+                        <br/>
+                    </div>
+                ))}
+                <br/>
             </div>
             <div className="messages-pane">
-              
                 <div style={{flex: "1 1 0", overflow: "scroll"}}>
                     <div className="message-bubble">
                         { chatHistory.map((msg, index) => <Bubble {...msg}/>) }
@@ -151,6 +152,19 @@ function ChatWithMe() {
                     {" "}
                     <input type="submit" disabled={processingUserMessage} value="→"/>
                 </form>
+            </div>
+            <div className="example-questions">
+                {showExampleQuestions && ( // Display example questions only if showExampleQuestions is true
+                    <div>
+                        <h2>Example Questions</h2>
+                        <p>Try asking one of these questions:</p>
+                        <ul>
+                            <li>Example Question 1</li>
+                            <li>Example Question 2</li>
+                            <li>Example Question 3</li>
+                        </ul>
+                    </div>
+                )}
             </div>
         </div>
     );
