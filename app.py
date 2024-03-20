@@ -6,6 +6,7 @@ from langchain_community.retrievers import BM25Retriever
 
 # ✨AI✨
 from langchain.memory import ChatMessageHistory
+from langchain_core.messages import AIMessage, SystemMessage
 
 # Our own stuff
 import config
@@ -79,7 +80,7 @@ def _get_data(messages, llm_choices):
 def infer(messages, llm, chain, callback):
     print("Running pre-inference step")
     try:
-        agg = AggregationRAG(llm, verbose=True)
+        agg = AggregationRAG(llm, verbose=True, notify_cb=lambda event: callback({}, { "answer" : event }))
         result = agg.answer(messages[-1])
         if result is not None:
             full = { **result.__dict__, "type" : "tabular" }
@@ -92,7 +93,7 @@ def infer(messages, llm, chain, callback):
     payload = {
         "messages": [
             *messages,
-            SystemMessage(content="No tabular output could be generated. Use the sources provided to answer the question.")
+            SystemMessage(content="No tabular output could be generated. Use the sources provided to answer the question")
         ]
     }
     full = None
@@ -153,7 +154,7 @@ if __name__ == "__main__":
         global memory
         chosen_answer = state.answers[chosen_answer.lower()]
         if chosen_answer["type"] == "tabular":
-            memory.add_ai_message("This question is best answered in a tabular format, which has be presented in the UI")
+            memory.add_ai_message("[This question was answered in a tabular format, which was presented in the UI]")
         else:
             memory.add_ai_message(chosen_answer["answer"])
         set_state(None)

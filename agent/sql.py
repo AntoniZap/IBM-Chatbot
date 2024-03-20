@@ -7,7 +7,7 @@ from llm import get_raw_llm
 from db import get_db
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, Iterator, List, Optional, Union, Callable
 from dataclasses import dataclass
 
 def inject_documents(connection: sqlite3.Connection):
@@ -144,6 +144,7 @@ class QueryGenerator:
         answer = self.llm.invoke(prompt)
         answer = answer.content if type(answer) is AIMessage else answer
         answer = answer.split("```")[0]
+        print("Annotation:", answer)
         return json.loads(f"[{answer}]" )
     
     def patch(self, query: str, error: str):
@@ -239,10 +240,16 @@ class AggregationRAG:
     databse as a whole
     """
         
-    def __init__(self, llm: LLM, verbose=False):
+    def __init__(
+            self,
+            llm: LLM,
+            verbose: bool =False,
+            notify_cb: Callable[[str], None] = lambda _: None
+    ):
         self.llm = llm
         self.connection = sqlite3.connect(":memory:")
         self.verbose = verbose
+        self.notify_cb = notify_cb
         inject_documents(self.connection)
         
     def answer(self, question: str) -> Optional[AggregationRAGResult]:
@@ -252,6 +259,7 @@ class AggregationRAG:
         :param question: The question
         """
         
+        self.notify_cb("Attempting to generate SQL…")
         query_generator = QueryGenerator(question, self.llm)
         failed_attempts = []
         attempts = 3
@@ -266,9 +274,12 @@ class AggregationRAG:
                     continue
             if self.verbose:
                 print("SQL Query:", answer)
+                print("Description:", description)
             try:
+                self.notify_cb("Performing query…")
                 results = list(self.connection.execute(answer))
                 if len(results) > 0:
+                    self.notify_cb("Annotating generated table…")
                     annotation = query_generator.annotate(answer, results[0])
                     return AggregationRAGResult(
                         column_names = annotation,
@@ -280,6 +291,8 @@ class AggregationRAG:
                 else:
                     return None
             except Exception as e:
+                if self.verbose:
+                    print("Repeating due to error:", e)
                 error, fix = str(e), answer
                 failed_attempts.append(fix)
         else:
