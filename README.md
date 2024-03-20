@@ -1,6 +1,6 @@
 Software Engineering Project - Group 21
 ---------------------------------------------------------------------------------------------------------------------------------------------
-<img src="image.png" alt="Alt text" width="15" height="15"/> Customer Review Q+A ChatBot
+<img src="LogoText.svg" alt="Alt text" width="15" height="15"/> Customer Review Q+A ChatBot
 
 An Overview of Project 30 - 
 --------------------------------------------------------------------------------------------------------------------------------------------  
@@ -35,30 +35,30 @@ pip3 install langchain_openai
 ```
 
 Failing to install torch the way described above may result in your VENV being populated with NVIDIA drivers that you likely do not need.
-If you do have an nvidia GPU, feel free to ommit the explicit torch install, as you may be able to run the code faster with CUDA.
+If you do have an Nvidia GPU, feel free to omit the explicit torch install, as you may be able to run the code faster with CUDA.
 
 To get a sample of data download the "Datafiniti" CSV file from [here](https://data.world/datafiniti/consumer-reviews-of-amazon-products).
 Place it in the project root directory.
-The program will for a csv with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
+The program will for a CSV with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
 
-In order to be able to chat with the bot, user will need to provide a way to connect with an LLM - either API key, or path.
-API keys for GPT and AI21 can be inserted in the program. Instruction on how to find them is available once application is ran. 
-Please modify .env.template to put LLAMA path if you wish to use LLAMA LLM. 
+To chat with the bot, the user will need to provide a way to connect with an LLM - either an API key, or path.
+API keys for OPENAI GPT and AI21 can be inserted into the program. Instruction on how to find them is available once the application is run. 
+Please modify .env.template to put the LLAMA path if you wish to use LLAMA LLM. 
 
 ## Running the Backend
 
-You can run the app.py including .env.template which will include the environment variables for LLMs and others or
-you can provide AI21 and GPT keys while the app will be running. 
+You can run the app.py including .env.template which will include the environment variables for LLMs and others (or
+you can provide AI21 and GPT keys while the app is running). 
 
 ## Running the Frontend
 
-Navigate to the `front-end` folder and setup prerequisites via:
+Navigate to the `front-end` folder and setup prerequisites via - this command needs to be executed only once:
 
 ```
-npm install`
+npm install
 ```
 
-You can then run the frontend using the command.
+Once npm is installed you can then run the frontend using the command:
 
 ```
 npm run start
