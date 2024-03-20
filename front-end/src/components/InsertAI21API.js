@@ -4,14 +4,15 @@ import {useState} from 'react';
 import ai21login from './images/loginai21.png'
 import apiSelect from './images/apiselectai21.png'
 import ai21profilelogo from './images/profileai21.png'
+import './ChatWithMe.css'
 
 
 function InsertAI21API() {
-    const [aiapiKey, setaiApiKey] = useState("Enter your AI21 API Key Here")
+    const [aiapiKey, setaiApiKey] = useState('')
     const click = () => {
-        alert(aiapiKey)
+        alert(" Api Key = " + aiapiKey)
     }
-    const change = () => {
+    const change = (event) => {
         setaiApiKey(event.target.value)
     }
     return(
@@ -22,7 +23,7 @@ function InsertAI21API() {
                  <h2 className="h2-api">Already have an AI21 API Key?</h2>
                 </header>
                 <p className= "phase1-OpenAi">Insert it below to get going, otherwise follow our quick and easy tutorial below!</p>
-                <input type="text" className = "input-val" onChange = {change} value = {aiapiKey}/>
+                <input type="text" className = "input-val" placeholder="Enter your OpenAI API Key Here..." onChange = {change} value = {aiapiKey} />
                 <button className = "API-button" onClick = {click}>Upload Api Key</button>
             </div>
             <div className = "tutorial-OpenAi21">

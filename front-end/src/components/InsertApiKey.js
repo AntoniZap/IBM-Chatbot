@@ -9,11 +9,11 @@ import createSecretApiKey from './images/createapikey.png'
 
 
 function InsertApiKey() {
-    const [apiKey, setApiKey] = useState("Enter your OpenAI API Key Here")
+    const [apiKey, setApiKey] = useState('')
     const click = () => {
-        alert(apiKey);
+        alert(" Api Key = " + apiKey);
     }
-    const change = () => {
+    const change = (event) => {
         setApiKey(event.target.value)
     }
     return(
@@ -24,7 +24,7 @@ function InsertApiKey() {
                  <h2 className="h2-api">Already have an OpenAi API Key?</h2>
                 </header>
                 <p className= "phase1-OpenAi">Insert it below to get going, otherwise follow our quick and easy tutorial below!</p>
-                <input type="text" className = "input-val" onChange = {change} value = {apiKey}/>
+                <input type="text" className = "input-val" onChange = {change} value = {apiKey} placeholder="Enter your OpenAI API Key Here..." />
                 <button className = "API-button" onClick = {click}>Upload Api Key</button>
             </div>
             <div className = "tutorial-OpenAi">
