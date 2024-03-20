@@ -39,7 +39,7 @@ If you do have an Nvidia GPU, feel free to omit the explicit torch install, as y
 
 To get a sample of data download the "Datafiniti" CSV file from [here](https://data.world/datafiniti/consumer-reviews-of-amazon-products).
 Place it in the project root directory.
-The program will for a CSV with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
+The program will search for a CSV with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
 
 To chat with the bot, the user will need to provide a way to connect with an LLM - either an API key, or path.
 API keys for OPENAI GPT and AI21 can be inserted into the program. Instruction on how to find them is available once the application is run. 
