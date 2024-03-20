@@ -6,16 +6,29 @@ import apiSelect from './images/apiselect.png'
 import apiKeySelect from './images/APIKeyFinder.png'
 import openailogo from './images/openailogo.png'
 import createSecretApiKey from './images/createapikey.png'
+import axios from "axios";
 
 
 function InsertApiKey() {
-    const [apiKey, setApiKey] = useState("Enter your OpenAI API Key Here")
-    const click = () => {
-        alert(apiKey);
+    axios.defaults.baseURL = 'http://localhost:5000';
+    const [llm_key, setKey] = useState('');
+    const handleInputChange = (event) => {
+      setKey(event.target.value);
     }
-    const change = () => {
-        setApiKey(event.target.value)
+    const click = async () => {
+        try {
+            await axios.post('/config', {llm_key: llm_key, llm:"OPENAI_API_KEY"})
+            .then(() => {
+                    alert("Key set!");
+                })
+                .catch(error => {
+                    console.error('Error setting key: ', error);
+                });
+        } catch (e) {
+            if (e instanceof Error) alert(e);
+        }
     }
+
     return(
         <div>
             <div className = "openai-card"> 
@@ -24,7 +37,7 @@ function InsertApiKey() {
                  <h2 className="h2-api">Already have an OpenAi API Key?</h2>
                 </header>
                 <p className= "phase1-OpenAi">Insert it below to get going, otherwise follow our quick and easy tutorial below!</p>
-                <input type="text" className = "input-val" onChange = {change} value = {apiKey}/>
+                <input type="text" placeholder="Enter your OpenAI API Key Here" className = "input-val" onChange = {handleInputChange} value = {llm_key}/>
                 <button className = "API-button" onClick = {click}>Upload Api Key</button>
             </div>
             <div className = "tutorial-OpenAi">
