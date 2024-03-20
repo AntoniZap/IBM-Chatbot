@@ -1,8 +1,8 @@
-Software Engineering Project - Group 21
+Software Engineering Project - Group 21 - Customer Review Q+A ChatBot
 ---------------------------------------------------------------------------------------------------------------------------------------------
-<img src="LogoText.svg" alt="Alt text" width="15" height="15"/> Customer Review Q+A ChatBot
+<img src="LogoText.svg" alt="Alt text" width="200" height="75"/> 
 
-An Overview of Project 30 - 
+An Overview of Project 30 
 --------------------------------------------------------------------------------------------------------------------------------------------  
 3️⃣ Third Years
  - Della Doherty (dohertd6@tcd.ie) - ICS
@@ -13,17 +13,17 @@ An Overview of Project 30 -
  - Jaedon Paget (pagetj@tcd.ie) - ICS
 
 2️⃣ Second Years
- - Sean Conway (SECONWAY@tcd.ie) - ICS
+ - Sean Conway (seconway@tcd.ie ) - ICS
  - Emmelia Klefti (kleftie@tcd.ie) - ICS
  - Nicholas Horvat (horvatn@tcd.ie) - ICS
- - Lorca Brannigan (Lbrannig@tcd.ie) - CSB
+ - Lorca Brannigan (lbrannig@tcd.ie) - CSB
  - Dylan Martin (martindy@tcd.ie) - ICS
 
-# ibm-sweng
+# IBM-SWENG
 
 ## Setup
 
-Reccomended CPU prerequisite setup.
+Recommended CPU prerequisite setup.
 
 ```
 python3 -m venv env
@@ -48,7 +48,7 @@ Please modify .env.template to put the LLAMA path if you wish to use LLAMA LLM.
 ## Running the Backend
 
 You can run the app.py including .env.template which will include the environment variables for LLMs and others (or
-you can provide AI21 and GPT keys while the app is running). 
+you can provide AI21 and GPT API keys while the app is running). 
 
 ## Running the Frontend
 
