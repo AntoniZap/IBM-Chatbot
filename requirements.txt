@@ -10,3 +10,6 @@ langchain_openai
 pytest
 flask
 flask-socketio
+flake8
+pytest
+torch --index-url https://download.pytorch.org/whl/cpu
