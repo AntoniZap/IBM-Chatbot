@@ -133,7 +133,7 @@ function ChatWithMe() {
                                                     <input defaultChecked={index == 0} value={msg.llm} id={"..."+index} type="radio" name="g1"/>
                                                     {msg.answer === undefined
                                                      ? <span style={{color: "red"}}>No data!</span>
-                                                     : (msg.answer.trim() || <em>(Nothing was returned 🕳️)</em>)}
+                                                     : (msg.answer.trim() || <em>...</em>)}
                                                 </label>
                                                 <div>
                                                     <RatingLLms llm={msg.llm} onRatingChange={handleRatingChange} />
