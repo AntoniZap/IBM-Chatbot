@@ -6,7 +6,6 @@ import apiSelect from './images/apiselectai21.png'
 import ai21profilelogo from './images/profileai21.png'
 import axios from "axios";
 
-
 function InsertAI21API() {
     axios.defaults.baseURL = 'http://localhost:5000';
     const [llm_key, setKey] = useState('');

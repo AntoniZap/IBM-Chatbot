@@ -8,6 +8,7 @@ import './App.css';
 import { ReactComponent as Logo } from './logo.svg'; // Ensure the path is correct
 import InsertApiKey from './components/InsertApiKey';
 import InsertAI21API from './components/InsertAI21API';
+import LandingPage from './components/LandingPage';
 
 
 function App() {
@@ -34,18 +35,7 @@ function App() {
         <div className="container-fluid d-flex justify-content-center align-items-stretch app-diagonal-gradient main-parent">
             <main role="main" className="inner cover">
               <Routes>
-                <Route path="/" element={
-                  <div className="d-flex align-items-center" style={{ height: "100%", textAlign: 'left', marginLeft: '-500px' }}> {/* Inline styles for left alignment */}
-                      <div>
-                          <h1 className="cover-heading">Welcome to Group 21's AI chatbot</h1>
-                          <p className="lead">Welcome to the Chatbot designed by Group 21 as part of our work with IBM and Large Language Models.</p>
-                          <p className="lead">To start just insert your document and ask as many questions as you want!</p>
-                          <p className="lead">
-                              <a href="https://elastic.co/what-is/large-language-models" className="btn btn-lg btn-secondary">Learn more</a>
-                          </p>
-                      </div>
-                  </div>
-                } />
+                <Route className= "home-page-1" path="/" element={<LandingPage />} />
                 <Route path="/insert-document" element={<InsertDocument />} />
                 <Route path="/chat-with-me" element={<ChatWithMe />} />
                 <Route className = "insert-api-key-123" path="/openai-api-key" element={<InsertApiKey/>} />
