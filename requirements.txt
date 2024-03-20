@@ -1,5 +1,5 @@
-streamlit
-langchain
+streamlit~=1.31.1
+langchain~=0.1.9
 langchain-community
 nucliadb_sdk
 torch
@@ -8,8 +8,9 @@ llama-cpp-python
 chromadb
 langchain_openai
 pytest
-flask
+flask~=3.0.2
 flask-socketio
 flake8
 pytest
+python-dotenv~=1.0.1
 

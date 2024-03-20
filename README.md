@@ -41,6 +41,7 @@ To get a sample of data download the "Datafiniti" CSV file from [here](https://d
 Place it in the project root directory.
 The program will search for a CSV with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
 
+
 To chat with the bot, the user will need to provide a way to connect with an LLM - either an API key, or path.
 API keys for OPENAI GPT and AI21 can be inserted into the program. Instruction on how to find them is available once the application is run. 
 Please modify .env.template to put the LLAMA path if you wish to use LLAMA LLM. 
@@ -61,5 +62,7 @@ npm install
 Once npm is installed you can then run the frontend using the command:
 
 ```
-npm run start
+npm start
 ```
+
+Please note that the frontend should be run in a terminal seperate from the backend.

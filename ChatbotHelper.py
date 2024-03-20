@@ -20,7 +20,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Our own stuff
 from local import resolve
-import config
+# import config
 
 # streamlit
 import streamlit as st
@@ -49,26 +49,26 @@ def get_db():
     return db
 
 
-@st.cache_resource()
-def get_llm():
-    if os.getenv('LLM') == "LLAMA":
-        from langchain_community.llms import LlamaCpp
-        from langchain.callbacks.manager import CallbackManager
-        from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-        llm = LlamaCpp(
-            model_path= os.getenv('LLAMA_MODEL_PATH'),
-            callback_manager = callback_manager,
-            verbose = True,
-            n_ctx=1024,
-        )
-    elif os.getenv('LLM') == "CHATGPT":
-        from langchain_openai import ChatOpenAI
-        llm = ChatOpenAI(temperature = 0.6)
-    elif os.getenv('LLM') == "AI21":
-       from langchain.llms import AI21
-       llm = AI21(temperature=0)
-    return llm
+# @st.cache_resource()
+# def get_llm():
+#     if os.getenv('LLM') == "LLAMA":
+#         from langchain_community.llms import LlamaCpp
+#         from langchain.callbacks.manager import CallbackManager
+#         from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+#         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+#         llm = LlamaCpp(
+#             model_path= os.getenv('LLAMA_MODEL_PATH'),
+#             callback_manager = callback_manager,
+#             verbose = True,
+#             n_ctx=1024,
+#         )
+#     elif os.getenv('LLM') == "CHATGPT":
+#         from langchain_openai import ChatOpenAI
+#         llm = ChatOpenAI(temperature = 0.6)
+#     elif os.getenv('LLM') == "AI21":
+#        from langchain.llms import AI21
+#        llm = AI21(temperature=0)
+#     return llm
 
 @st.cache_resource()
 def get_memory():
