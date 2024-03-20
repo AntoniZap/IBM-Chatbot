@@ -41,7 +41,7 @@ jobs:
     - name: Install dependencies part 2
       run: |
     #    python3 -m pip install flake8 pytest
-       python3 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+        python3 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 
     - name: Pip list packages
       run: pip list packages
