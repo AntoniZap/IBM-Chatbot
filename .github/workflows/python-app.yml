@@ -9,6 +9,10 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  AI21_API_KEY: ${{ secrets.AI21_API_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
 permissions:
   contents: read
 
@@ -25,16 +29,7 @@ jobs:
         cache: 'pip'
 
 
-   # - uses: actions/cache@v3
-   #   id: cache
-   #   with:
-   #     path: ~/.cache/pip
-   #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-   #     restore-keys: |
-   #       ${{ runner.os }}-pip-
-
     - name: Install dependencies part 1
-    #  if: steps.cache.outputs.cache-hit != 'true'
       run: |
         python3 -m pip install -r requirements.txt
         
@@ -42,8 +37,8 @@ jobs:
       run: |
         python3 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 
-    - name: Pip list packages
-      run: pip list packages
+    #- name: Pip list packages
+    #  run: pip list packages
 
     - name: Lint with flake8
       run: |
