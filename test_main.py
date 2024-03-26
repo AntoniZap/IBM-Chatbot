@@ -25,7 +25,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 from local import resolve
 from csv_to_langchain import CSVLoader
-from app import get_datafiniti_documents, populate_db
+from db import get_datafiniti_documents, populate_db
 
 os.environ['LLM'] = 'TESTING'
 
