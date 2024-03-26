@@ -95,7 +95,7 @@ def infer(messages, llm, chain, callback):
     payload = {
         "messages": [
             *messages,
-            SystemMessage(content="No tabular output could be generated. Use the sources provided to answer the question")
+            SystemMessage(content="No tabular output could be generated. Use the sources provided to answer the question. Note that these sources are limited.")
         ]
     }
     full = None
