@@ -8,18 +8,16 @@ uri = "mongodb+srv://admin:wzE6nBcB4bnpyDUY@ibm.zbskp8h.mongodb.net/?retryWrites
 client = MongoClient(uri)
 db = client["IBM"]
 collection = db["feature_ranking"]
-num = random.random()
 
 def addRating1(User_id, llm, rating):
     post = {"User_id" : User_id, "LLM": llm, "Rating" : rating}
     collection.insert_one(post)
     return
 
-def addRating2(_id, User_id, llm1, rating1, llm2, rating2):
-    post1 = {"_id" : _id, "User_id" : User_id, "LLM": llm1, "Rating" : rating1}
-    post2 = {"_id" : _id, "User_id" : User_id, "LLM": llm2, "Rating" : rating2}
+def addRating2(User_id, llm1, rating1, llm2, rating2):
+    post1 = {"User_id" : User_id, "LLM": llm1, "Rating" : rating1}
+    post2 = {"User_id" : User_id, "LLM": llm2, "Rating" : rating2}
     collection.insert_one(post1)
-    _id +=1
     collection.insert_one(post2)
     return
 
@@ -44,6 +42,8 @@ def getAverageRating(LLM):
 
 def getUserRating(User_id, llm):
     result = collection.find_one({"User_id" :User_id,"LLM" : llm})
+    if result is None:
+        return None
     return result["Rating"]
 
 
