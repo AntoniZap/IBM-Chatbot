@@ -94,6 +94,12 @@ label:hover {
     padding: 20px;
 }
 
+.options-pane {
+    flex-shrink: 1;
+    flex-grow: 0.25;
+    flex-basis: 20%;
+}
+
 .messages-pane {
     gap: 10px;
     display: flex;

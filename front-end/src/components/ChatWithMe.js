@@ -108,7 +108,7 @@ function ChatWithMe() {
     
     return (
         <div className="master">
-            <div>
+            <div className="options-pane">
                 <div>
                     <h2>Enabled LLMs</h2>
                     <p>These LLMs will be included in the response</p>
