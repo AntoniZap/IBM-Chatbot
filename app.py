@@ -56,7 +56,7 @@ class Closure:
             "answer": whole.get("answer", "")
         })
 
-def _get_data(messages, llm_choices):
+def _get_data(messages, llm_choices, sql=False):
     jobs = []
     pool = ThreadPoolExecutor(4)
 
@@ -68,7 +68,7 @@ def _get_data(messages, llm_choices):
         llm = get_raw_llm(llm_choice)
         chain = context_source | get_llm(llm_choice)
         print(f"Submitting task for `{llm_choice}`")
-        job = pool.submit(infer, messages, llm, chain, Closure(llm_choice))
+        job = pool.submit(infer, messages, llm, chain, Closure(llm_choice), sql=sql)
         jobs.append((llm_choice, job))
 
     answers = []
@@ -79,18 +79,22 @@ def _get_data(messages, llm_choices):
     
     return answers, context
 
-def infer(messages, llm, chain, callback):
-    print("Running pre-inference step")
-    try:
-        agg = AggregationRAG(llm, verbose=True, notify_cb=lambda event: callback({}, { "answer" : event }))
-        result = agg.answer(messages[-1])
-        if result is not None:
-            full = { **result.__dict__, "type" : "tabular" }
-            return full
-        else:
-            print("got empty result, but things were otherwise okay")
-    except LLMUnreliableException as e:
-        print(f"LLM not reliable: {e}")
+def infer(messages, llm, chain, callback, sql=False):
+    if sql:
+        print("Running pre-inference step")
+        try:
+            agg = AggregationRAG(llm, verbose=True, notify_cb=lambda event: callback({}, { "answer" : event }))
+            result = agg.answer(messages[-1])
+            if result is not None:
+                full = { **result.__dict__, "type" : "tabular" }
+                return full
+            else:
+                print("got empty result, but things were otherwise okay")
+        except LLMUnreliableException as e:
+            print(f"LLM not reliable: {e}")
+    else:
+        print("SQL Aggregation tool disabled")
+        
     print("Starting inference for LLM")
     payload = {
         "messages": [
@@ -144,9 +148,10 @@ if __name__ == "__main__":
         if len(llm_choices) == 0:
             return jsonify(answers={})
         message = data.get('message')
+        sql = data.get('sql')
         set_state(PendingInferenceComplete(data=data))
         memory.add_user_message(message)
-        answers, sources = _get_data(memory.messages, llm_choices)
+        answers, sources = _get_data(memory.messages, llm_choices, sql=sql)
         set_state(PendingResponseChoice(answers={ answer["llm"]: answer for answer in answers }))
         return jsonify({
             "answers": answers,

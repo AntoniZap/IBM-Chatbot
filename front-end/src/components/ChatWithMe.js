@@ -82,8 +82,9 @@ function ChatWithMe() {
             }
 
             const llms = [...document.querySelectorAll('[name="g2"]:checked')].map((input) => input.value);
+            const sql = document.querySelector('#sql-checkbox').checked;
 
-            await axios.post('/message', {message: message, llms })
+            await axios.post('/message', {message: message, llms, sql })
                 .then(response => {
                     setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: message }]);
                     setAnswers(Object.fromEntries(response.data.answers.map(answer => [answer.llm, answer])));
@@ -117,6 +118,16 @@ function ChatWithMe() {
                             <br/>
                         </div>
                     ))}
+                    <br/>
+
+                    <h2>Enabled Tools</h2>
+                    <p>These tools will be used in the LLM response</p>
+                        <div>
+                            <label>
+                                <input value="sqla" id="sql-checkbox" type="checkbox"/>Table Aggregation Tool - <small>If a question benefits from aggregations over the whole database, the agent will attempt to perform such an aggregation and return a table representing the result.</small>
+                            </label>
+                            <br/>
+                        </div>
                     <br/>
                 </div>
             </div>
