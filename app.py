@@ -9,12 +9,14 @@ from langchain.memory import ChatMessageHistory
 from langchain_core.messages import AIMessage, SystemMessage
 
 # Our own stuff
-import config
+from csv_to_langchain import CSVLoader
+from local import resolve
 
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Iterator, List, Optional, Union
 from dataclasses import dataclass, field
 import datetime
+from dotenv import load_dotenv, find_dotenv, dotenv_values
 
 from agent.sql import AggregationRAG, LLMUnreliableException
 from db import get_db
@@ -109,6 +111,11 @@ def infer(messages, llm, chain, callback):
 set_state(None)
 memory = ChatMessageHistory()
 
+
+def refresh_environment_vars():
+    for env_key, env_value in dotenv_values('.env').items():
+        os.environ[env_key] = env_value
+
 if __name__ == "__main__":
     from flask import Flask, request, jsonify
     from flask_cors import CORS
@@ -116,6 +123,13 @@ if __name__ == "__main__":
     app = Flask(__name__)
     socketio = SocketIO(app, cors_allowed_origins="*")
     CORS(app)
+    path_to_env = find_dotenv()
+    if path_to_env:
+        load_dotenv(path_to_env)
+    else:
+        open('.env', 'w')
+        load_dotenv('.env')
+    refresh_environment_vars()
 
     @app.route('/message', methods=['POST'])
     def get_data():
@@ -157,6 +171,26 @@ if __name__ == "__main__":
             memory.add_ai_message("[This question was answered in a tabular format, which was presented in the UI]")
         else:
             memory.add_ai_message(chosen_answer["answer"])
+        set_state(None)
+        return jsonify(200)
+
+
+    @app.route('/config', methods=['POST'])
+    def config_llm():
+        data = request.json
+        global state
+        llm = data.get('llm')
+        llm_key = data.get('llm_key')
+        with open('.env', 'r') as read_dotenv:
+            lines = read_dotenv.readlines()
+        lines_to_write = [f'{llm}={llm_key}']
+        with open('.env', 'w') as write_dotenv:
+            for line in lines:
+                if not (line.startswith(llm) or line.isspace()):
+                    lines_to_write.append(f'\n{line}')
+            write_dotenv.writelines(lines_to_write)
+        load_dotenv(path_to_env)
+        refresh_environment_vars()
         set_state(None)
         return jsonify(200)
 

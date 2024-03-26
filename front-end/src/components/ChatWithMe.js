@@ -29,7 +29,7 @@ const Answer = ({ type, ...rest }) => {
                    {rest.results.map(result => <tr>{result.map(r => <td><span>{r}</span></td>)}</tr>)}
                </table>
     } else {
-        return rest.answer;
+        return rest.answer?.trim() ?? <span style={{color: "red"}}>No data!</span>;
     }
 }
 

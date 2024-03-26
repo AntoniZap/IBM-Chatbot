@@ -4,15 +4,26 @@ import {useState} from 'react';
 import ai21login from './images/loginai21.png'
 import apiSelect from './images/apiselectai21.png'
 import ai21profilelogo from './images/profileai21.png'
-
+import axios from "axios";
 
 function InsertAI21API() {
-    const [aiapiKey, setaiApiKey] = useState("Enter your AI21 API Key Here")
-    const click = () => {
-        alert(aiapiKey)
+    axios.defaults.baseURL = 'http://localhost:5000';
+    const [llm_key, setKey] = useState('');
+    const handleInputChange = (event) => {
+      setKey(event.target.value);
     }
-    const change = () => {
-        setaiApiKey(event.target.value)
+    const click = async () => {
+        try {
+            await axios.post('/config', {llm_key: llm_key, llm:"AI21_API_KEY"})
+            .then(() => {
+                    alert("Key set!");
+                })
+                .catch(error => {
+                    console.error('Error setting key: ', error);
+                });
+        } catch (e) {
+            if (e instanceof Error) alert(e);
+        }
     }
     return(
         <div>
@@ -22,7 +33,7 @@ function InsertAI21API() {
                  <h2 className="h2-api">Already have an AI21 API Key?</h2>
                 </header>
                 <p className= "phase1-OpenAi">Insert it below to get going, otherwise follow our quick and easy tutorial below!</p>
-                <input type="text" className = "input-val" onChange = {change} value = {aiapiKey}/>
+                <input type="text" placeholder="Enter your AI21 API Key Here" className = "input-val" onChange = {handleInputChange} value = {llm_key}/>
                 <button className = "API-button" onClick = {click}>Upload Api Key</button>
             </div>
             <div className = "tutorial-OpenAi21">
