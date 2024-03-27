@@ -33,14 +33,14 @@ from dotenv import load_dotenv, find_dotenv, dotenv_values
 class PendingInferenceComplete:
     data: object
     timestamp: str = field(default_factory=lambda: str(datetime.datetime.now()))
-
+      
 @dataclass
 class PendingResponseChoice:
     answers: Dict[str, str]
     """
     A mapping from llm names → answers
     """
-
+    
 @functools.cache
 def get_db():
     #documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:200]

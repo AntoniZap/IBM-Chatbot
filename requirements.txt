@@ -13,4 +13,5 @@ flask-socketio
 flake8
 pytest
 python-dotenv~=1.0.1
+pymongo
 
