@@ -10,5 +10,8 @@ langchain_openai
 pytest
 flask~=3.0.2
 flask-socketio
+flake8
+pytest
 python-dotenv~=1.0.1
 pymongo
+

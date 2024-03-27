@@ -9,6 +9,11 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  AI21_API_KEY: ${{ secrets.AI21_API_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+
 permissions:
   contents: read
 
@@ -17,23 +22,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    
+    - name: Restore Cache
+      uses: actions/cache@v3
+      id: cache
+      with:
+        path: ~/.local/lib/python3.10
+        key: ${{ runner.os }}-pip-python-3-10-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: | 
+          ${{ runner.os }}-pip-python-3-10-
+        
+    - name: Install Dependencies
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        python3 -m pip install flake8 pytest
-        python3 -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-        python3 -m pip install -r requirements.txt
+        python3 -m pip install --user flake8 pytest
+        python3 -m pip install --user torch --index-url https://download.pytorch.org/whl/cpu
+        python3 -m pip install --user -r requirements.txt
+
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        python3 -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        python3 -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
     - name: Test with pytest
       run: |
-        pytest
-    
-    
+        python3 -m pytest
