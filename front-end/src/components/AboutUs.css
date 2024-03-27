@@ -2,18 +2,12 @@
 .member-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 20px;
-  margin-top: 500px; /* Adjust this value to match the height of your sticky header */
-  padding: 20px; /* Optional: for some inner spacing */
-  overflow: auto;
+  gap: 20px;
+  padding: 40px; /* Optional: for some inner spacing */
   justify-content: center; /* Center grid items horizontally */
-  /* background-color: #ffcccc; Light shade of red */
   width: 100vw; /* This will make the container exactly the width of the viewport */
   position: relative; /* To offset any potential side effects of using vw */
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  height: 100%;
 }
 
 .member {

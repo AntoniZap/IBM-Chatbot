@@ -1,12 +1,15 @@
+* { box-sizing: border-box; }
+
 /* App.css */
 .App {
-  text-align: center;
+    text-align: center;
+    margin: 50px;
 }
 
 .App-logo {
   height: 8vmin; /* Adjust the size of the logo */
   pointer-events: none;
-margin-right: 20 px; /* Add some space between the logo and the nav links */
+  margin-right: 20px; /* Add some space between the logo and the nav links */
 }
 
 /* Remove or comment out the animation if not needed for the logo */
@@ -17,6 +20,7 @@ margin-right: 20 px; /* Add some space between the logo and the nav links */
 
 /* Updated .App-header for a white background and horizontal layout */
 .App-header {
+    flex: 0 1 auto;
   background-color: #fff; /* Set the header background to white */
   padding: 1rem; /* Add some padding */
   box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: Adds a shadow for depth */
@@ -41,13 +45,32 @@ margin-right: 20 px; /* Add some space between the logo and the nav links */
   display: inline-block; /* Treat the links as inline-block elements */
 }
 
+.dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  width: 200px;
+  z-index: 100;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
 .app-diagonal-gradient {
   /* background: linear-gradient(135deg, #FAFAFA, #F3757C); */
   color: white;
   /* background-repeat: no-repeat;
   background-attachment: fixed; */
 } 
-
 
 .cover-heading,
 .lead {
@@ -80,4 +103,20 @@ margin-right: 20 px; /* Add some space between the logo and the nav links */
 .App .member .member-role,
 .App .member .member-about {
   font-size: 14px; /* Adjust as needed */
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+}
+
+.main-parent {
+    flex: 1 1 auto;
+    height: 100%;
+}
+
+main {
+    height: 100%;
 }
