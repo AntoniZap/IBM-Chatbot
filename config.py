@@ -13,6 +13,6 @@ if os.environ.get("OPENAI_API_KEY") is None:
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 if os.environ.get("AI21_API_KEY") is None:
-  os.environ['AI21_API_KEY'] = 'xGf4pLrLFNdn3mAPWIo6Gd6qhHOZUQxI'
+  os.environ['AI21_API_KEY'] = ''
 AI21_API_KEY = os.getenv("AI21_API_KEY")
 
