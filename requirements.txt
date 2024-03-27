@@ -11,3 +11,4 @@ pytest
 flask~=3.0.2
 flask-socketio
 python-dotenv~=1.0.1
+pymongo
