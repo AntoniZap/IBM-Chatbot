@@ -1,23 +1,27 @@
-Software Engineering Project - Group 21 - Customer Review Q+A ChatBot
----------------------------------------------------------------------------------------------------------------------------------------------
-<img src="LogoText.svg" alt="Alt text" width="200" height="75"/> 
+## Software Engineering Project - Group 21 - Customer Review Q+A ChatBot
 
-An Overview of Project 30 
---------------------------------------------------------------------------------------------------------------------------------------------  
+<img src="LogoText.svg" alt="Alt text" width="200" height="75"/>
+
+An Overview of Project 30
+
+---
+
 3️⃣ Third Years
- - Della Doherty (dohertd6@tcd.ie) - ICS
- - Darragh Clifford (dcliffor@tcd.ie) - ICS
- - Antoni Zapedowski (zapedowa@tcd.ie) - ICS
- - Chinaza Uzoukwu (uzoukwuc@tcd.ie) - ICS
- - Sprina Chen (chensp@tcd.ie) - CSB
- - Jaedon Paget (pagetj@tcd.ie) - ICS
+
+- Della Doherty (dohertd6@tcd.ie) - ICS
+- Darragh Clifford (dcliffor@tcd.ie) - ICS
+- Antoni Zapedowski (zapedowa@tcd.ie) - ICS
+- Chinaza Uzoukwu (uzoukwuc@tcd.ie) - ICS
+- Sprina Chen (chensp@tcd.ie) - CSB
+- Jaedon Paget (pagetj@tcd.ie) - ICS
 
 2️⃣ Second Years
- - Sean Conway (seconway@tcd.ie ) - ICS
- - Emmelia Klefti (kleftie@tcd.ie) - ICS
- - Nicholas Horvat (horvatn@tcd.ie) - ICS
- - Lorca Brannigan (lbrannig@tcd.ie) - CSB
- - Dylan Martin (martindy@tcd.ie) - ICS
+
+- Sean Conway (seconway@tcd.ie ) - ICS
+- Emmelia Klefti (kleftie@tcd.ie) - ICS
+- Nicholas Horvat (horvatn@tcd.ie) - ICS
+- Lorca Brannigan (lbrannig@tcd.ie) - CSB
+- Dylan Martin (martindy@tcd.ie) - ICS
 
 # IBM-SWENG
 
@@ -41,15 +45,14 @@ To get a sample of data download the "Datafiniti" CSV file from [here](https://d
 Place it in the project root directory.
 The program will search for a CSV with the name `Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv` in the directory in which it is invoked.
 
-
 To chat with the bot, the user will need to provide a way to connect with an LLM - either an API key, or path.
-API keys for OPENAI GPT and AI21 can be inserted into the program. Instruction on how to find them is available once the application is run. 
-Please modify .env.template to put the LLAMA path if you wish to use LLAMA LLM. 
+API keys for OPENAI GPT and AI21 can be inserted into the program. Instruction on how to find them is available once the application is run.
+Please modify .env.template to put the LLAMA path if you wish to use LLAMA LLM.
 
 ## Running the Backend
 
 You can run the app.py including .env.template which will include the environment variables for LLMs and others (or
-you can provide AI21 and GPT API keys while the app is running). 
+you can provide AI21 and GPT API keys while the app is running).
 
 ## Running the Frontend
 
@@ -66,3 +69,9 @@ npm start
 ```
 
 Please note that the frontend should be run in a terminal seperate from the backend.
+
+This is what the program should look like:
+
+![alt text](https://github.com/Antyk45/IBM-Chatbot/blob/dylan/images/Image%20files/Frontend%20image.png "FeedBot Frontend Example")
+
+![alt text](https://github.com/Antyk45/IBM-Chatbot/blob/dylan/images/Image%20files/Query%20image.png "FeedBot Query Example")
