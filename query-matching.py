@@ -34,7 +34,7 @@ def get_best_LLM(query):
         for entry in entries_matched:
             rating = entry['Rating']
             if rating == 3:
-                no_rating.append(entry['LLM'])
+                no_rating.append({'LLM' : entry['LLM']})
             else:
                 if rating >= 4:
                     positive_ratings.append({'LLM': entry['LLM'], 'Rating': rating})
