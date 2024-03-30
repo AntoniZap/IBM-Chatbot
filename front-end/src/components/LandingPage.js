@@ -37,7 +37,7 @@ function LandingPage() {
         <div className = "home-page">
             <div className= "heading-main">
                 <h1 className = "landing-page-headline">Discover the Possibilities of AI-powered Conversations with FeedBot</h1>
-                <p className = "sub-headline">Group 21 welcome's you to FeedBot! Your Customer Review Assistant.</p>
+                <p className = "sub-headline">We welcome you to FeedBot, your customer review assistant!</p>
                 <img src = {ChatwithmePicture} alt = "chatwithme" className = "chatwithme-image"></img>
             </div>
             <div className="about-container">
@@ -45,13 +45,13 @@ function LandingPage() {
                 <h2>Discover how FeedBot revolutionizes your customer feedback experience</h2>
                 <p className="heading-text">FeedBot allows users to navigate customer feedback reviews seamlessly and effectively. It aims to aid in your choice of product and ensure you are
                         well informed before your purchase. </p>
-                <p className="heading-text">It does this by enabling the user to ask questions and unlock insights from customer reviews using AI driven technology. Users benefit from well-crafted responses as FeedBot leverages <a href="https://elastic.co/what-is/large-language-models">Large Language Models</a> such as ChatGPT, AI21, and LLAMA. </p>
+                <p className="heading-text">FeedBot enables the user to ask questions and unlock insights from customer reviews using AI-driven technology. Users benefit from well-crafted responses as FeedBot leverages <a href="https://elastic.co/what-is/large-language-models">Large Language Models</a> including ChatGPT, AI21, and LLAMA. </p>
             </div>
             <div className="howitworks-section">
                 <div className="howitworks-section-top">
-                    <h1 className="heading-section2">How FeedBot Works</h1>
+                    <h1 className="heading-section2">Setting up FeedBot</h1>
                 </div>
-                <h2 className= "sub-heading">Follow these 3 steps quick and easy steps:</h2>
+                <h2 className= "sub-heading">Follow these three simple steps to get FeedBot up and running:</h2>
                 <div className="howitworks-section-bottom">
                     {workData.map((data) => (
                      <div className="howitworks-section-info" key={data.title}>
