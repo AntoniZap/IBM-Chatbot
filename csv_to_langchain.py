@@ -75,8 +75,22 @@ class CSVLoader(BaseLoader):
         Load data into document objects
         """
         
+        for fileEncoding in ["utf-8-sig", "utf-16", "utf-32"]:
+            try:
+                with open(self.file_path, newline="", encoding=fileEncoding) as csvfile:
+                    csv_reader = csv.DictReader(csvfile, **self.csv_args)
+                    for i, row in enumerate(csv_reader):
+                        continue
+                break
+            except UnicodeDecodeError as e:
+                print(e)
+            except UnicodeError as e:
+                print(e)
+        else:
+            fileEncoding = "latin1"
+            
         documents = []
-        with open(self.file_path, newline="", encoding="utf8") as csvfile:
+        with open(self.file_path, newline="", encoding=fileEncoding) as csvfile:
             csv_reader = csv.DictReader(csvfile, **self.csv_args)
             for row, review in enumerate(csv_reader):
                 name = review.get('name') or ''
