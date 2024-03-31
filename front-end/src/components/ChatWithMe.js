@@ -12,26 +12,11 @@ import io from 'socket.io-client'
 const socket = io('http://localhost:5000');
 const validLLMs = ["llama", "chatgpt", "ai21"];
 
-const Bubble = ({ sender, message, className, ...props }) =>
+const Bubble = ({ sender, message, className, llm, ...props }) =>
 <div className={`message ${sender} ${className ?? ""}`} {...props}>
     <text>{message}</text>
     <img src={sender === 'user' ? User : Bot} alt={`${sender} icon`} className="user-icon" />
 </div>
-
-const Answer = ({ type, ...rest }) => {
-    if (type == "regular") {
-        return rest["answer"];
-    } else if (type == "tabular") {
-        return <table>
-                   <tr>
-                       {rest.column_names.map(name => <td><span>{name}</span></td>)}
-                   </tr>
-                   {rest.results.map(result => <tr>{result.map(r => <td><span>{r}</span></td>)}</tr>)}
-               </table>
-    } else {
-        return rest.answer?.trim() ?? <span style={{color: "red"}}>No data!</span>;
-    }
-}
 
 function ChatWithMe() {
     axios.defaults.baseURL = 'http://localhost:5000';
@@ -41,7 +26,7 @@ function ChatWithMe() {
     const [sources, setSources] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
     const [llmRatings, setLlmRatings] = useState({});
-    const [showImage, setShowImage] = useState(true); // New state for showing image
+    const [showImage, setShowImage] = useState(false); // New state for showing image
 
     useEffect(() => {
         socket.on("socket", (data) => {
@@ -53,6 +38,65 @@ function ChatWithMe() {
             });
         });
     }, []);
+
+    const Answer = ({
+        index,
+        onRatingChange,
+        type,
+        llm,
+        ...rest
+    }) => {
+        let body;
+        let sourceBody;
+        
+        if (type == "tabular") {
+            body =
+                <>
+                    <table>
+                        <tr>
+                            {rest.column_names.map(name => <td><span>{name}</span></td>)}
+                            </tr>
+                        {rest.results.map(result => <tr>{result.map(r => <td><span>{r}</span></td>)}</tr>)}
+                    </table>
+                </>;
+            sourceBody =
+                <>
+                    <h4>generated query</h4>
+                    <pre style={{whiteSpace: "normal"}}>{rest.query}</pre>
+                </>;
+        } else {
+            body = rest.answer?.trim() ?? <span style={{color: "red"}}>No data!</span>;
+            sourceBody = sources.length > 0 && (
+                <>
+                    <h3>Sources</h3>
+                    { sources.map((source, index) => (
+                        <>
+                            <p><strong>Product:</strong> {source.productName}<br/>
+                            <strong>Rating:</strong> {source.rating ?? "N/A"}</p>
+                            <blockquote key={index}>{source.pageContent}</blockquote>
+                        </>)) }
+                </>
+            );
+        }
+        return [
+            <label className="llm-sub-container">
+                <input defaultChecked={index == 0} value={llm} id={"..."+index} type="radio" name="g1"/>
+                <center>
+                    <h4>{llm}</h4>
+                    {body}
+                    <RatingLLms llm={llm} onRatingChange={onRatingChange} />
+                </center>
+            </label>,
+            <label className="llm-sub-container">
+                <input type="checkbox"/>
+                <div className="source-body-source">
+                    <p>▼ Hide sources</p>
+                    <div>{sourceBody}</div>
+                </div>
+                <span className="source-body-no-source">➤ Show sources</span>
+            </label>
+        ];
+    }
 
     const handleInputChange = (event) => {
       setMessage(event.target.value);
@@ -115,7 +159,6 @@ function ChatWithMe() {
                     {validLLMs.map((ai, index) => (
                         <div key={`enabled-llm.${ai}.${index}`}>
                             <label><input value={ai} type="checkbox" name="g2"/> {ai}</label>
-                            <br/>
                         </div>
                     ))}
                     <br/>
@@ -139,40 +182,22 @@ function ChatWithMe() {
                         { processingUserMessage && <Bubble className="loading" sender="user" message={message}/> }
                     </div>
                     {
-                        sources.length > 0 && (
-                            <>
-                                <h3>Sources</h3>
-                                { sources.map((source, index) => (<>
-                                    <p><strong>Product:</strong> {source.productName}<br/>
-                                    <strong>Rating:</strong> {source.rating ?? "N/A"}</p>
-                                    <blockquote key={index}>{source.pageContent}</blockquote>
-                                </>)) }
-                            </>
-                        )
-                    }
-                    {
                         (Object.keys(answers).length > 0) && (
                             <>
                                 <h3>Answers</h3>
-                                <center className="lmm-container-box">
+                                <div className="llm-container-box">
                                     {
                                         Object.values(answers).map((msg, index) => (
-                                            <div key={`answer.${index}.${msg.llm}`}
-                                                 className={processingUserMessage
-                                                            ? "processingUserMessage llm-container"
-                                                            : "llm-container" }>
-                                                <label>
-                                                    <h4>{msg.llm}</h4>
-                                                    <input defaultChecked={index == 0} value={msg.llm} id={"..."+index} type="radio" name="g1"/>
-                                                    <span style={{whiteSpace: "pre-line"}}>{<Answer {...msg}/>}</span>
-                                                </label>
-                                                <div>
-                                                    <RatingLLms llm={msg.llm} onRatingChange={handleRatingChange} />
-                                                </div>
+                                            <div key={`answer.${index}.${msg.llm}`} className="llm-container">
+                                                <span
+                                                    className={processingUserMessage ? "processingUserMessage" : "" }
+                                                    style={{whiteSpace: "pre-line"}}>
+                                                    <Answer index={index} onRatingChange={handleRatingChange} {...msg}/>
+                                                </span>
                                             </div>
                                         ))
                                     }
-                                </center>
+                                </div>
                             </>
                         )
                     }
