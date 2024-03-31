@@ -325,5 +325,5 @@ if __name__ == "__main__":
             if answer is not None:
                 print(json.dumps(answer.__dict__, indent=4))
         except LLMUnreliableException as e:
-            print(f"Unable to generate shit: {e}")
+            print(f"Unable to generate: {e}")
         print("---\n")
