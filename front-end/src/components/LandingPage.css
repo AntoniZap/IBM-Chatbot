@@ -109,7 +109,9 @@
 
 .chatwithme-image{
     border-radius: 10px;
-    width: 100%;
+    max-width: 100%;
+    overflow: auto;
+    max-height: 100%;
     object-fit: contain;
     flex-shrink: 1;
 }
@@ -119,7 +121,6 @@
     gap: 40px;
     flex-direction: column;
     align-items: center;
-    flex-shrink: 1.5;
 }
 
 @media (max-width: 1000px) {
