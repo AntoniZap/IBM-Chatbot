@@ -1,22 +1,65 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Bot from '../assets/bot.png';
 import User from '../assets/user.png';
 import ExampleQuestions from '../assets/ExampleQuestions.png'; // Import the ExampleQuestions.png image
 import RatingLLms from './RatingLLms.js';
 import './ChatWithMe.css'; // Import the CSS file
-
-const mock = [{"answer":"\nAmazon Kindle E-Reader 6\" Wifi (8th Generation, 2016)","llm":"LLaMa"}, {"answer":"\nAmazon Kindle E-Reader 6\" Wifi (8th Generation, 2016)","llm":"AI21"}];
+import ReactPaginate from 'react-paginate';
 
 import io from 'socket.io-client'
 const socket = io('http://localhost:5000');
 const validLLMs = ["llama", "chatgpt", "ai21"];
 
-const Bubble = ({ sender, message, className, llm, ...props }) =>
-<div className={`message ${sender} ${className ?? ""}`} {...props}>
-    <text>{message}</text>
-    <img src={sender === 'user' ? User : Bot} alt={`${sender} icon`} className="user-icon" />
-</div>
+const AnswerBody = ({ answer, paginationRef }) => {
+    if (answer.type == "tabular") {
+        const [page, setPage] = useState(0);
+        const pageCount = Math.ceil(answer.results.length / 10);
+        const pagination = pageCount <= 1
+              ?  undefined
+              : <ReactPaginate
+                    breakLabel="…"
+                    previousLabel="◄"
+                    nextLabel="►"
+                    pageClassName="page-class"
+                    onPageChange={async (event) => setPage(event.selected) }
+                    marginPagesDisplayed={1}
+                    pageRangeDisplayed={1}
+                    pageCount={pageCount}
+                    containerClassName="page-container-class"
+                />;
+        
+        if (paginationRef !== undefined) {
+            paginationRef.current = pagination;
+        }
+
+        return <div>
+                   <table>
+                       <tr>
+                           {answer.column_names.map(name => <td><span>{name}</span></td>)}
+                       </tr>
+                       {answer.results.slice(page, page + 10).map(result => <tr>{result.map(r => <td><span>{r}</span></td>)}</tr>)}
+                   </table>
+                   {paginationRef === undefined && pagination}
+               </div>;
+    } else {
+        const text = (typeof answer === "string" || answer instanceof String)
+              ? answer
+              : answer.answer;
+        return <text>{text?.trim() ?? <span style={{color: "red"}}>No data! {JSON.stringify(answer)}</span>}</text>;
+    }
+}
+
+const Bubble = ({ sender, message, className, llm, ...props }) => {
+    const paginationRef = useRef(undefined);
+    return <div className={`message ${className ?? ""}`} {...props}>
+               <div className={`${sender}`}>
+                   <img src={sender === 'user' ? User : Bot} alt={`${sender} icon`} className="user-icon"/>
+                   <AnswerBody answer={message} paginationRef={paginationRef}/>
+               </div>
+               <center>{paginationRef.current}</center>
+           </div>;
+}
 
 function ChatWithMe() {
     axios.defaults.baseURL = 'http://localhost:5000';
@@ -26,7 +69,7 @@ function ChatWithMe() {
     const [sources, setSources] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
     const [llmRatings, setLlmRatings] = useState({});
-    const [showImage, setShowImage] = useState(false); // New state for showing image
+    const [showImage, setShowImage] = useState(true); // New state for showing image
 
     useEffect(() => {
         socket.on("socket", (data) => {
@@ -46,38 +89,22 @@ function ChatWithMe() {
         llm,
         ...rest
     }) => {
-        let body;
-        let sourceBody;
-        
-        if (type == "tabular") {
-            body =
-                <>
-                    <table>
-                        <tr>
-                            {rest.column_names.map(name => <td><span>{name}</span></td>)}
-                            </tr>
-                        {rest.results.map(result => <tr>{result.map(r => <td><span>{r}</span></td>)}</tr>)}
-                    </table>
-                </>;
-            sourceBody =
-                <>
+        const body = <AnswerBody answer={{...rest, type}}/>;
+        const sourceBody = type == "tabular"
+              ? <>
                     <h4>generated query</h4>
                     <pre style={{whiteSpace: "normal"}}>{rest.query}</pre>
-                </>;
-        } else {
-            body = rest.answer?.trim() ?? <span style={{color: "red"}}>No data!</span>;
-            sourceBody = sources.length > 0 && (
-                <>
-                    <h3>Sources</h3>
-                    { sources.map((source, index) => (
-                        <>
-                            <p><strong>Product:</strong> {source.productName}<br/>
-                            <strong>Rating:</strong> {source.rating ?? "N/A"}</p>
-                            <blockquote key={index}>{source.pageContent}</blockquote>
-                        </>)) }
                 </>
-            );
-        }
+              : (sources.length > 0 && (
+                  <>
+                      <h3>Sources</h3>
+                      { sources.map((source, index) => (
+                          <>
+                              <p><strong>Product:</strong> {source.productName}<br/>
+                              <strong>Rating:</strong> {source.rating ?? "N/A"}</p>
+                              <blockquote key={index}>{source.pageContent}</blockquote>
+                          </>)) }
+                  </>));
         return [
             <label className="llm-sub-container">
                 <input defaultChecked={index == 0} value={llm} id={"..."+index} type="radio" name="g1"/>
@@ -120,17 +147,17 @@ function ChatWithMe() {
                         console.error('Error selecting answer:', error);
                         return;
                     }
-                    setChatHistory(chatHistory => [...chatHistory, { sender: 'bot', message: answers[llm].answer }]);
+                    setChatHistory(chatHistory => [...chatHistory, { sender: 'bot', message: answers[llm] }]);
                     setAnswers(answers => ({}));
                 }
             }
 
             const llms = [...document.querySelectorAll('[name="g2"]:checked')].map((input) => input.value);
-            const sql = document.querySelector('#sql-checkbox').checked;
+            const sql = document.querySelector('#sql-checkbox')?.checked;
 
             await axios.post('/message', {message: message, llms, sql })
                 .then(response => {
-                    setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: message }]);
+                    setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: { answer: message } }]);
                     setAnswers(Object.fromEntries(response.data.answers.map(answer => [answer.llm, answer])));
                     setSources(response.data.sources);
                 })

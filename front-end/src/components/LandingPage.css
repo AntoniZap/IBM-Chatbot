@@ -1,61 +1,39 @@
 .home-page{
-    position: absolute;
-    top: 20px;
-    left: 0;
+    display: flex;
+    flex-direction: column;
     width: 100vw;
+    align-items: center;
     background: linear-gradient(rgba(255, 255, 255, 0), rgba(202, 98, 103, 0.1), rgba(202, 98, 103, 0.5));
     background-size: cover;
     background-position: center;
-    padding: 5px;
-  }
+    padding: 20px;
+    min-height: 100%;
+}
+
+.heading-main * {
+    text-align: center;
+}
   
 .landing-page-headline{
-    text-align: center;
-    margin-top: 200px;
-    color:black;
-    width: 800px;
-    margin-left: 20px;
     font-weight: 700;
 }
 
 .sub-headline{
-    margin-top: 30px;
     font-size: 20px;
-    width: 700px;
-    text-align:center;
-    color: black;
-    margin-left: 70px;
 }
 
-.chatwithme-image{
-    margin-left: 900px;
-    margin-top: -300px;
-    width: 800px;
-    border-radius: 10px;
+.howitworks-section {
+    margin-top: 50px;
 }
 
-.heading-section2{
-    color:black;
-}
-
-.heading-text{
-    color: black;
-    margin-top: 20px;
-    width: 650px;
-}
-
-.howitworks-section{
-    margin-top: 50px;;
-}
-
-.howitworks-section-top{
+.howitworks-section-top {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
 
-.howitworks-section-bottom{
+.howitworks-section-bottom {
   margin-top: 50px;
   display: flex;
   justify-content: center;
@@ -76,7 +54,6 @@
     border-radius: 1rem;
     color: #505050;
     margin: 1rem 2rem;
-    margin-bottom: 40px;
 }
 
 .image-info{
@@ -88,7 +65,6 @@
 .howitworks-section-bottom h2 {
     font-size: 25px;
     margin: 1rem 0rem;
-    color: black;
 }
 
 .howitworks-section-bottom p {
@@ -100,13 +76,8 @@
 
 .about-container{
     justify-content: center;
-    width: 750px;
-    height: 350px;
-    color: black;
     background-color: white;
     border-radius: 1rem;
-    margin-left: 40px;
-    margin-top: -100px;
     padding: 20px;
 }
 
@@ -117,14 +88,42 @@
 
 .sub-heading{
     margin-top: 30px;
-    color: black;
     text-align: center;
 }
 
-.button-card{
+.button-card {
     width: 150px;
     height: 60px;
     border-radius: 5px;
     background-color: rgb(222, 235, 104);
     border: none;
+}
+
+.description-and-image-container {
+    max-width: 1400px;
+    padding: 10px;
+    gap: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.chatwithme-image{
+    border-radius: 10px;
+    width: 100%;
+    object-fit: contain;
+    flex-shrink: 1;
+}
+
+.description-container {
+    display: flex;
+    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 1.5;
+}
+
+@media (max-width: 1000px) {
+    .description-and-image-container {
+        flex-direction: column;
+    }
 }
