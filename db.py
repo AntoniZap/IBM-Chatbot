@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 
 import config
 
+#retrieves the documents from the csv's file_name metadata columns and column names
 def get_datafiniti_documents(file_name: str) -> List[Document]:
     loader = CSVLoader(
        file_name,
@@ -20,6 +21,7 @@ def get_datafiniti_documents(file_name: str) -> List[Document]:
     documents = loader.load()
     return documents
 
+#returns a chroma document from the csv file listed within
 @functools.cache
 def get_db():
     documents = get_datafiniti_documents("_Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")
@@ -48,6 +50,7 @@ class PopulateDBResult:
     The number of documents that existed already in the database.
     """
 
+#populates the database with the documents
 def populate_db(db: Chroma, documents: List[Document]) -> PopulateDBResult:
     persisted_documents = db.get()
 

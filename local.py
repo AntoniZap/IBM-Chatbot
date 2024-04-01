@@ -54,6 +54,7 @@ languages = {
     }
 }
 
+#used to translate simple ui elements into other languages 
 def resolve(language, key):
     variations = languages[key]
     language = language.lower()

@@ -5,6 +5,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from local import resolve
 from config import options
 
+#setup function for llama
 def setup_llama():
     from langchain_community.llms import LlamaCpp
     from langchain.callbacks.manager import CallbackManager
@@ -20,16 +21,19 @@ def setup_llama():
     llm.client.set_cache(LlamaDiskCache())
     return llm
 
+#setup function for chatgpt
 def setup_chatgpt():
     from langchain_openai import ChatOpenAI
     llm = ChatOpenAI(temperature = 0.6)
     return llm
 
+#setup function for ai21
 def setup_ai21():
     from langchain_community.llms import AI21
     llm = AI21(temperature=0)
     return llm
 
+#retrieves the llm based on the llm_choice parameter
 def get_raw_llm(llm_choice):
     global raw_llms
     llm_choice = llm_choice.lower()
@@ -48,6 +52,7 @@ def get_raw_llm(llm_choice):
         raw_llms[llm_choice] = llm
     return raw_llms[llm_choice]
     
+#safer alternative to get_raw_llm which checks if the llm is already setup first
 def get_llm(llm_choice):
     global llms
     llm_choice = llm_choice.lower()
