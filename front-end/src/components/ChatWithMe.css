@@ -5,28 +5,23 @@
 }
 
 .message-bubble {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-.user {
-  align-self: flex-start;
-  background-color: #E6E6E6; /* Add background color for user message */
-  color: black;
-  flex-direction: row-reverse; /* switch message direction  */
+.bot, .user {
+    display: flex
 }
 
 .bot {
-  align-self: flex-end;
-  flex-direction: row; /* switch message direction  */
-  background-color: #CA6267; /* background color for the bot message */
-  color: #FFFFFF
+  flex-direction: row-reverse; /* switch message direction  */
 }
 
 .message {
   display: flex;
+  flex-direction: column;
   width: fit-content;           
-  max-width: 500px;             /* make sure each box is not too big*/
+  max-width: 600px;             /* make sure each box is not too big*/
   margin-top: 8px;
   margin-bottom: 8px;
   font-size: 15px;              /* text size */
@@ -34,9 +29,22 @@
   border-radius: 10px;          /* rounded corners */
 }
 
-text{
+.message:has(.user) {
+  align-self: flex-start;
+  background-color: #E6E6E6; /* Add background color for user message */
+  color: black;
+}
+
+.message:has(.bot) {
+    background-color: #CA6267; /* background color for the bot message */
+    color: #FFFFFF;
+    align-self: flex-end;
+}
+
+text {
   text-align: justify;          /* Make the text aligned on each side */
   margin: auto;                 /* Center the text vertically */
+  whitespace: pre-line;
 }
 
 .llm-container input {
@@ -44,17 +52,20 @@ text{
     user-select: none;
 }
 
+.source-body-no-source, .source-body-no-source                  { text-align: left; }
+.llm-sub-container:has(input:checked)    .source-body-no-source { display: none; }
+.llm-sub-container:not(:has(input:checked)) .source-body-source { display: none; }
+
 label:hover {
-    filter: brightness(2.0);
+    filter: brightness(1.075);
 }
 
-.llm-container:has(label:hover) {
+.llm-container:has(label:hover) .llm-sub-container {
     background-color: #E6E6E6;
 }
 
-.llm-container:has(input[name="g1"]:checked) {
+.llm-container:has(.llm-sub-container input[name="g1"]:checked) .llm-sub-container {
     background-color: #ca626784;
-    /* border: 2px outset #DAA; */
 }
 .llm-container-box {
     display: flex;
@@ -65,11 +76,18 @@ label:hover {
 .llm-container {
     width: 100%;
     border-radius: 10px;
-    background-color: buttonface;
-    /* border: 2px outset buttonface; */
-    margin-bottom: 10px;
-    padding: 10px;
+    /* background-color: buttonface; */
+    padding: 5px;
     color: black;
+}
+
+.llm-sub-container {
+    width: 100%;
+    border-radius: 10px;
+    background-color: buttonface;
+    padding: 10px;
+    margin-bottom: 5px;
+    backdrop-filter: opacity(1.0);
 }
 
 .loading {
@@ -88,6 +106,7 @@ label:hover {
     flex-direction: row;
     height: 100%;
     width: 80vw;
+    flex: 1;
 }
 
 .master > * {
@@ -118,7 +137,7 @@ label:hover {
     flex: 1;
 }
 
-blockquote {
+.source-quote {
     padding-left: 20px;
     border-left: 2px solid #B6B6B6;
 }
@@ -128,6 +147,22 @@ td span {
     padding: 2px;
 }
 
-table {
-    
+.page-container-class { list-style-type: none; }
+.page-container-class li { display: inline-block; }
+.page-class { margin: 7px; }
+.page-container-class .previous { padding-right: 10px; }
+.page-container-class .next { padding-left: 10px; }
+.page-container-class .selected { text-decoration: underline; }
+.page-container-class { margin-top: 10px; }
+/* override default blue color of prev / next button */
+.page-container-class a { text-decoration: none; color: black; }
+/* dont let the user select the text of any page select elements as they shouldn't need to */
+.page-container-class { user-select: none; }
+
+@media (max-width: 1000px) {
+    .master {
+        flex-direction: column-reverse;
+        height: 1000px;
+        min-height: 100%;
+    }
 }

@@ -15,7 +15,6 @@ function App() {
 
   return (
     <Router>
-        <div className="top">
       <header className="App-header">
         <Logo className="App-logo" alt="logo" /> {/* Logo added here */}
                 <nav className="nav nav-masthead justify-content-center">
@@ -44,7 +43,6 @@ function App() {
               </Routes>
             </main>
           </div>
-        </div>
     </Router>
   );
 }

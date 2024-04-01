@@ -35,17 +35,22 @@ function LandingPage() {
 
     return (
         <div className = "home-page">
-            <div className= "heading-main">
-                <h1 className = "landing-page-headline">Discover the Possibilities of AI-powered Conversations with FeedBot</h1>
-                <p className = "sub-headline">We welcome you to FeedBot, your customer review assistant!</p>
-                <img src = {ChatwithmePicture} alt = "chatwithme" className = "chatwithme-image"></img>
-            </div>
-            <div className="about-container">
-                <h2 className="about-header">About</h2>
-                <h2>Discover how FeedBot revolutionizes your customer feedback experience</h2>
-                <p className="heading-text">FeedBot allows users to navigate customer feedback reviews seamlessly and effectively. It aims to aid in your choice of product and ensure you are
+            <div className="description-and-image-container">
+                <div className="description-container">
+                    <div className= "heading-main">
+                        <h1 className = "landing-page-headline">Discover the Possibilities of AI-powered Conversations with FeedBot</h1>
+                        <p className = "sub-headline">We welcome you to FeedBot, your customer review assistant!</p>
+                    </div>
+                    <div className="about-container">
+                        <h2 className="about-header">About</h2>
+                        <h2>Discover how FeedBot revolutionizes your customer feedback experience</h2>
+                        <br/>
+                        <p>FeedBot allows users to navigate customer feedback reviews seamlessly and effectively. It aims to aid in your choice of product and ensure you are
                         well informed before your purchase. </p>
-                <p className="heading-text">FeedBot enables the user to ask questions and unlock insights from customer reviews using AI-driven technology. Users benefit from well-crafted responses as FeedBot leverages <a href="https://elastic.co/what-is/large-language-models">Large Language Models</a> including ChatGPT, AI21, and LLAMA. </p>
+                        <p>FeedBot enables the user to ask questions and unlock insights from customer reviews using AI-driven technology. Users benefit from well-crafted responses as FeedBot leverages <a href="https://elastic.co/what-is/large-language-models">Large Language Models</a> including ChatGPT, AI21, and LLAMA. </p>
+                    </div>
+                </div>
+                <img src = {ChatwithmePicture} alt = "chatwithme" className = "chatwithme-image"></img>
             </div>
             <div className="howitworks-section">
                 <div className="howitworks-section-top">
