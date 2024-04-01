@@ -44,6 +44,7 @@
 text {
   text-align: justify;          /* Make the text aligned on each side */
   margin: auto;                 /* Center the text vertically */
+  whitespace: pre-line;
 }
 
 .llm-container input {
@@ -136,7 +137,7 @@ label:hover {
     flex: 1;
 }
 
-blockquote {
+.source-quote {
     padding-left: 20px;
     border-left: 2px solid #B6B6B6;
 }
