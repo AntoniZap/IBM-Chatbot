@@ -26,6 +26,7 @@ from local import resolve
 # streamlit
 import streamlit as st
 
+-
 os.environ['LLM'] = "ChatGPT"
 os.environ['OPENAI_API_KEY'] = ''
 os.environ['AI21_API_KEY'] = ''
@@ -171,5 +172,4 @@ def get_llm():
     return jsonify(200)
     
 if __name__ == "__main__":
-    app.run(port=5000)
-    
+    app.run(port=5000)  
