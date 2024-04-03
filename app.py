@@ -1,7 +1,6 @@
 import os
 import os.path
 import sys
-
 # Document loading and the link
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -9,7 +8,6 @@ from sentence_transformers import SentenceTransformer
 from langchain_core.documents.base import Document
 from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnablePassthrough
-
 # ✨AI✨
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
@@ -18,19 +16,16 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.memory import ChatMessageHistory
 from langchain.chains.combine_documents import create_stuff_documents_chain
-
 # Our own stuff
 from csv_to_langchain import CSVLoader
 from local import resolve
+ # streamlit
+ import streamlit as st
 
-# streamlit
-import streamlit as st
 
--
-os.environ['LLM'] = "ChatGPT"
-os.environ['OPENAI_API_KEY'] = ''
-os.environ['AI21_API_KEY'] = ''
-
+ os.environ['LLM'] = "ChatGPT"
+ os.environ['OPENAI_API_KEY'] = ''
+ os.environ['AI21_API_KEY'] = ''
 global db
 @st.cache_resource()
 def get_db():
@@ -53,38 +48,30 @@ def get_db():
             persist_directory=".chroma_db"
         )
     return db
-
 db = get_db()
 @st.cache_resource()
 def get_memory():
     global memory
     memory = ChatMessageHistory()
     return memory
-
 @st.cache_resource()
 def get_options():
     global options
     options = { "language" : "English" }
     return options
-
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
-
-
 # Flask
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
-
-
 def setup_env_var():
     setup_env = str(os.getenv('LLM'))
     if setup_env == 'None':
         setup("ChatGPT")
     else:
         setup(setup_env)
-
 def setup(llm_choice):
     global llm
     if llm_choice == "LLAMA":
@@ -109,7 +96,6 @@ def setup(llm_choice):
     memory = get_memory()
     global options
     options = get_options()
-
     # prompt template
     system_prompt = resolve(options["language"], "system_prompt")
     prompt = ChatPromptTemplate.from_messages(
@@ -127,15 +113,11 @@ def setup(llm_choice):
         .assign(answer=document_chain)
     
     return llm           
-
 setup_env_var()
-
 @app.route('/message', methods=['POST'])
 def get_data():
     
     return ['ChatGPT:    ' + get_ai_response('ChatGPT'), 'AI21:    ' + get_ai_response('AI21'), 'LLAMA:    Disabled for demonstration!']
-
-
 def get_ai_response(llm_choice):
     setup(llm_choice)
     data = request.json
@@ -145,7 +127,6 @@ def get_ai_response(llm_choice):
     payload = { "messages": memory.messages }
     
     full = None
-
     with st.spinner(resolve(options["language"], "loading")):
         for item in retrieval_chain.stream(payload):
             if full is None:
@@ -155,7 +136,6 @@ def get_ai_response(llm_choice):
             
             print(item)
         st.write("\n")
-
     if full is not None:
         if type(full) is str:
             memory.add_ai_message(full)
@@ -163,13 +143,12 @@ def get_ai_response(llm_choice):
             memory.add_ai_message(full["answer"])
     print('Response = "' + full["answer"] +'"')
     return full["answer"]
-
 @app.route('/llm', methods=['POST'])
 def get_llm():
     data = request.json
     llm_choice=data.get('llm')
     setup(llm_choice)
-    return jsonify(200)
-    
-if __name__ == "__main__":
-    app.run(port=5000)  
+     return jsonify(200)
+
+ if __name__ == "__main__":
+     app.run(port=5000)
