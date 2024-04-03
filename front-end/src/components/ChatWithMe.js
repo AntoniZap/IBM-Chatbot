@@ -68,10 +68,11 @@ function ChatWithMe() {
     const [chatHistory, setChatHistory] = useState([]);
     const [answers, setAnswers] = useState({});
     const [sources, setSources] = useState([]);
-    const [best_llm, setBestLLM] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
     const [llmRatings, setLlmRatings] = useState({});
     const [showImage, setShowImage] = useState(true); // New state for showing image
+    const [llms, setLlms] = useState([]);
+    const [bestLlm, setBestLlm] = useState([]);
 
     useEffect(() => {
         socket.on("socket", (data) => {
@@ -89,10 +90,10 @@ function ChatWithMe() {
         onRatingChange,
         type,
         llm,
-        best_llm,
         ...props
     }) => {
         const body = <AnswerBody answer={{...props, type}}/>;
+        const isBestllm = bestLlm.includes(llm);
         const sourceBody = type == "tabular"
               ? <>
                     <h4>generated query</h4>
@@ -115,6 +116,7 @@ function ChatWithMe() {
                            <h4>{llm}</h4>
                            {body}
                            <RatingLLms llm={llm} onRatingChange={onRatingChange} />
+                           {isBestllm && <img src={Star} alt="Recomend LLM" className="star" />}
                        </center>
                    </label>
                    <label className="llm-sub-container">
@@ -155,7 +157,7 @@ function ChatWithMe() {
                 }
             }
 
-            const llms = [...document.querySelectorAll('[name="g2"]:checked')].map((input) => input.value);
+            setLlms([...document.querySelectorAll('[name="g2"]:checked')].map((input) => input.value));
             const sql = document.querySelector('#sql-checkbox')?.checked;
 
             await axios.post('/message', {message: message, llms, sql })
@@ -163,7 +165,7 @@ function ChatWithMe() {
                     setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: { answer: message } }]);
                     setAnswers(Object.fromEntries(response.data.answers.map(answer => [answer.llm, answer])));
                     setSources(response.data.sources);
-                    setBestLLM(response.data.best_llm);
+                    setBestLlm(response.data.best_llm);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
