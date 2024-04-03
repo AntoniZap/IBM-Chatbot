@@ -20,11 +20,16 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 # Our own stuff
 from local import resolve
-import config
+# import config
 
 # streamlit
 import streamlit as st
 from csv_to_langchain import CSVLoader
+
+# Used for loading the data, creating the embeddings, and creating the db
+# Currently it gets the first 10 lines of the csv file and creates embeddings for them
+# It then creates a Chroma db from the embeddings
+# It has a recursive text splitter that splits the text into chunks this is mainly useful for large documents
 
 @st.cache_resource()
 def get_db():
@@ -49,35 +54,39 @@ def get_db():
     return db
 
 
-@st.cache_resource()
-def get_llm():
-    if os.getenv('LLM') == "LLAMA":
-        from langchain_community.llms import LlamaCpp
-        from langchain.callbacks.manager import CallbackManager
-        from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-        callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-        llm = LlamaCpp(
-            model_path= os.getenv('LLAMA_MODEL_PATH'),
-            callback_manager = callback_manager,
-            verbose = True,
-            n_ctx=1024,
-        )
-    elif os.getenv('LLM') == "CHATGPT":
-        from langchain_openai import ChatOpenAI
-        llm = ChatOpenAI(temperature = 0.6)
-    elif os.getenv('LLM') == "AI21":
-       from langchain.llms import AI21
-       llm = AI21(temperature=0)
-    return llm
+# @st.cache_resource()
+# def get_llm():
+#     if os.getenv('LLM') == "LLAMA":
+#         from langchain_community.llms import LlamaCpp
+#         from langchain.callbacks.manager import CallbackManager
+#         from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+#         callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
+#         llm = LlamaCpp(
+#             model_path= os.getenv('LLAMA_MODEL_PATH'),
+#             callback_manager = callback_manager,
+#             verbose = True,
+#             n_ctx=1024,
+#         )
+#     elif os.getenv('LLM') == "CHATGPT":
+#         from langchain_openai import ChatOpenAI
+#         llm = ChatOpenAI(temperature = 0.6)
+#     elif os.getenv('LLM') == "AI21":
+#        from langchain.llms import AI21
+#        llm = AI21(temperature=0)
+#     return llm
 
+
+#returns the Chat message history
 @st.cache_resource()
 def get_memory():
     memory = ChatMessageHistory()
     return memory
 
+#returns the language options
 @st.cache_resource()
 def get_options():
     return { "language" : "English" }
+
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
