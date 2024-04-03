@@ -20,6 +20,7 @@ from dotenv import load_dotenv, find_dotenv, dotenv_values
 from agent.sql import AggregationRAG, LLMUnreliableException
 from db import get_db
 from llm import get_llm, get_raw_llm
+import query_matching
 
 @dataclass
 class PendingInferenceComplete:
@@ -151,14 +152,18 @@ if __name__ == "__main__":
         set_state(PendingInferenceComplete(data=data))
         memory.add_user_message(message)
         answers, sources = _get_data(memory.messages, llm_choices, sql=sql)
+        best_llm = query_matching.get_best_LLM(message)
         set_state(PendingResponseChoice(answers={ answer["llm"]: answer for answer in answers }))
         return jsonify({
             "answers": answers,
+            "best_llm" : best_llm,
             "sources" : [ { "pageContent" : source.page_content,
                             "title" : source.metadata["title"],
                             "rating" : source.metadata["rating"],
-                            "productName" : source.metadata["name"] }
+                            "productName" : source.metadata["name"]
+                            }
                           for source in sources ]
+                          
         })
     
     
