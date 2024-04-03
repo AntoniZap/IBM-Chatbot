@@ -9,6 +9,7 @@ client = MongoClient(uri)
 db = client["IBM"]
 collection = db["feature_ranking"]
 
+
 def addRating1(User_id, querey, llm, rating):
     post = {"User_id" : User_id, "Query": query, "LLM": llm, "Rating" : rating}
     collection.insert_one(post)
@@ -19,7 +20,6 @@ def addRating2(User_id, query, llm1, rating1, llm2, rating2):
     post1 = {"User_id": User_id, "Query": query, "LLM": llm1, "Rating": rating1}
     post2 = {"User_id": User_id, "Query": query, "LLM": llm2, "Rating": rating2}
     collection.insert_one(post1)
-    _id +=1
     collection.insert_one(post2)
     return
 

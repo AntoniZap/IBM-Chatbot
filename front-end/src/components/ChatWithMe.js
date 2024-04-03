@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Bot from '../assets/bot.png';
 import User from '../assets/user.png';
+import Star from '../assets/star.png';
 import ExampleQuestions from '../assets/ExampleQuestions.png'; // Import the ExampleQuestions.png image
 import RatingLLms from './RatingLLms.js';
 import './ChatWithMe.css'; // Import the CSS file
@@ -67,6 +68,7 @@ function ChatWithMe() {
     const [chatHistory, setChatHistory] = useState([]);
     const [answers, setAnswers] = useState({});
     const [sources, setSources] = useState([]);
+    const [best_llm, setBestLLM] = useState([]);
     const [processingUserMessage, setProcessingUserMessage] = useState(false);
     const [llmRatings, setLlmRatings] = useState({});
     const [showImage, setShowImage] = useState(true); // New state for showing image
@@ -87,9 +89,11 @@ function ChatWithMe() {
         onRatingChange,
         type,
         llm,
+        best_llm,
         ...props
     }) => {
         const body = <AnswerBody answer={{...props, type}}/>;
+        const isBestLLM = best_llm.includes(llm);
         const sourceBody = type == "tabular"
               ? <>
                     <h4>generated query</h4>
@@ -112,6 +116,7 @@ function ChatWithMe() {
                            <h4>{llm}</h4>
                            {body}
                            <RatingLLms llm={llm} onRatingChange={onRatingChange} />
+                           {isBestLLM && <img src={Star} alt="Star Icon" className="star"/>}
                        </center>
                    </label>
                    <label className="llm-sub-container">
@@ -160,6 +165,7 @@ function ChatWithMe() {
                     setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: { answer: message } }]);
                     setAnswers(Object.fromEntries(response.data.answers.map(answer => [answer.llm, answer])));
                     setSources(response.data.sources);
+                    setBestLLM(response.data.best_llm);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
