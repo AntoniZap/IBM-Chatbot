@@ -93,7 +93,6 @@ function ChatWithMe() {
         ...props
     }) => {
         const body = <AnswerBody answer={{...props, type}}/>;
-        const isBestLLM = best_llm.includes(llm);
         const sourceBody = type == "tabular"
               ? <>
                     <h4>generated query</h4>
@@ -116,7 +115,6 @@ function ChatWithMe() {
                            <h4>{llm}</h4>
                            {body}
                            <RatingLLms llm={llm} onRatingChange={onRatingChange} />
-                           {isBestLLM && <img src={Star} alt="Star Icon" className="star"/>}
                        </center>
                    </label>
                    <label className="llm-sub-container">
