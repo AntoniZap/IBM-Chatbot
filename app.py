@@ -1,5 +1,4 @@
 import os.path
-
 # Document loading and the link
 from langchain_core.runnables import RunnablePassthrough
 from langchain_community.retrievers import BM25Retriever
