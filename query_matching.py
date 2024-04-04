@@ -25,9 +25,11 @@ def get_old_queries():
 #
 def get_best_LLM(query):
     old_queries = get_old_queries()
-    matches = process.extract(query, old_queries, score_cutoff = 65, scorer=fuzz.token_set_ratio)
+    all_matches = process.extract(query, old_queries, scorer=fuzz.token_set_ratio)
+    cutoff_score = 65
+    matches = [match for match in all_matches if match[1] >= cutoff_score] 
     for match in matches:
-        entries_matched = collection.find({"Query" : match})       
+        entries_matched = list(collection.find({"Query" : match[0]}))      
         positive_ratings = []
         negative_ratings = 0 
         no_rating = []
@@ -44,17 +46,13 @@ def get_best_LLM(query):
             max_rating = max(positive_ratings, key=lambda x: x['Rating'])
             best_LLMs = []
             for llm in positive_ratings:
-                if llm['Rating'] == max_rating['Rating']:
+                if llm['Rating'] == max_rating['Rating'] and llm['LLM'] not in best_LLMs:
                     best_LLMs.append(llm['LLM'])
             return best_LLMs
         if negative_ratings > 0 and no_rating:
             return no_rating
         
     return None                                                 
-            
-                
-
-        
     
     
     
