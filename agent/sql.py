@@ -10,12 +10,12 @@ from sentence_transformers.util import cos_sim
 from typing import Any, Dict, Iterator, List, Optional, Union, Callable
 from dataclasses import dataclass
 
+
 def inject_documents(connection: sqlite3.Connection):
     """
     Adds a "Reviews" table to the database, deleting any reviews table that exists already.
     """
-
-    documents = get_db().get(include=["metadatas", "embeddings", "documents"])
+    documents = get_db(".csv").get(include=["metadatas", "embeddings", "documents"])
     ids = documents["ids"]
     pages = documents["documents"]
     metadatas = documents["metadatas"]

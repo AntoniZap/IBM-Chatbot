@@ -11,6 +11,8 @@ from typing import Any, Dict, Iterator, List, Optional, Union
 
 import config
 
+global filename
+filename = ""
 #retrieves the documents from the csv's file_name metadata columns and column names
 def get_datafiniti_documents(file_name: str) -> List[Document]:
     loader = CSVLoader(
@@ -23,8 +25,13 @@ def get_datafiniti_documents(file_name: str) -> List[Document]:
 
 #returns a chroma document from the csv file listed within
 @functools.cache
-def get_db():
-    documents = get_datafiniti_documents("_Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv")
+def get_db(inputFile):
+    global filename
+    if inputFile == ".csv":
+        inputFile = filename
+    elif inputFile.endswith(".csv"):
+        filename = inputFile
+    documents = get_datafiniti_documents(inputFile)
     print("Loading persisted ChromaDB data store")
     db = Chroma(
         persist_directory=".chroma_db",

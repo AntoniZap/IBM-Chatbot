@@ -60,7 +60,8 @@ def _get_data(messages, llm_choices, sql=False):
     pool = ThreadPoolExecutor(4)
 
     question = messages[-1].content
-    context = get_db().as_retriever(k=1).invoke(question)
+    global filename
+    context = get_db(filename).as_retriever(k=1).invoke(question)
     context_source = RunnablePassthrough.assign(context=lambda _: context)
     
     for llm_choice in llm_choices:
@@ -123,6 +124,7 @@ if __name__ == "__main__":
     from flask import Flask, request, jsonify
     from flask_cors import CORS
     from flask_socketio import SocketIO
+    from os import listdir
     app = Flask(__name__)
     socketio = SocketIO(app, cors_allowed_origins="*")
     CORS(app)
@@ -133,7 +135,8 @@ if __name__ == "__main__":
         open('.env', 'w')
         load_dotenv('.env')
     refresh_environment_vars()
-
+    global filename
+    filename = "_Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv"
     @app.route('/message', methods=['POST'])
     def get_data():
         global state
@@ -178,6 +181,24 @@ if __name__ == "__main__":
         set_state(None)
         return jsonify(200)
 
+
+    @app.route('/setFile', methods=['POST'])
+    def set_file():
+        data = request.json
+        global filename
+        filename = data.get('file')
+        print('Updated filename to: "' + filename + '"')
+        return jsonify(200)
+
+    @app.route('/files', methods=['POST'])
+    def get_files():
+        files = []
+        for file in listdir("."):
+            if file.endswith(".csv"):
+                print(file)
+                files.append(file)
+
+        return jsonify({"files" : files})
 
     @app.route('/config', methods=['POST'])
     def config_llm():
