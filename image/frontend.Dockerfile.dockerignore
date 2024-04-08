@@ -1,0 +1,7 @@
+env
+**/*.py
+chroma
+.chroma_db
+**/__pycache__
+*.csv
+**/node_modules
