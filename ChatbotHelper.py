@@ -26,6 +26,11 @@ from local import resolve
 import streamlit as st
 from csv_to_langchain import CSVLoader
 
+# Used for loading the data, creating the embeddings, and creating the db
+# Currently it gets the first 10 lines of the csv file and creates embeddings for them
+# It then creates a Chroma db from the embeddings
+# It has a recursive text splitter that splits the text into chunks this is mainly useful for large documents
+
 @st.cache_resource()
 def get_db():
     documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()[:10]
@@ -70,14 +75,18 @@ def get_db():
 #        llm = AI21(temperature=0)
 #     return llm
 
+
+#returns the Chat message history
 @st.cache_resource()
 def get_memory():
     memory = ChatMessageHistory()
     return memory
 
+#returns the language options
 @st.cache_resource()
 def get_options():
     return { "language" : "English" }
+
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever

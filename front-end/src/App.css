@@ -1,11 +1,6 @@
 * { box-sizing: border-box; }
 
 /* App.css */
-.App {
-    text-align: center;
-    margin: 50px;
-}
-
 .App-logo {
   height: 8vmin; /* Adjust the size of the logo */
   pointer-events: none;
@@ -65,21 +60,14 @@
   display: block;
 }
 
-.app-diagonal-gradient {
-  /* background: linear-gradient(135deg, #FAFAFA, #F3757C); */
-  color: white;
-  /* background-repeat: no-repeat;
-  background-attachment: fixed; */
-} 
-
 .cover-heading,
 .lead {
   padding-left: 15px; /* Optional: Add some padding to ensure the text is not right against the screen edge */
   text-align: left; /* Aligns text to the left */
   color: black;
   
-}
 
+}
 .App-link {
   color: #61dafb;
 }
@@ -105,18 +93,12 @@
   font-size: 14px; /* Adjust as needed */
 }
 
-.top {
+#root {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    max-height: 100vh;
-}
-
-.main-parent {
-    flex: 1 1 auto;
     height: 100%;
 }
 
-main {
+.main-parent {
     height: 100%;
 }

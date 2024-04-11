@@ -1,33 +1,25 @@
-import os
 import os.path
-import shutil
-
 # Document loading and the link
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
 from langchain_core.runnables import RunnablePassthrough
-from langchain.docstore.document import Document
+from langchain_community.retrievers import BM25Retriever
 
 # ✨AI✨
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_community.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ChatMessageHistory
+from langchain_core.messages import AIMessage, SystemMessage
 
 # Our own stuff
 from csv_to_langchain import CSVLoader
 from local import resolve
 
-import functools
-from threading import Thread
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Iterator, List, Optional, Union
 from dataclasses import dataclass, field
-import time
 import datetime
 from dotenv import load_dotenv, find_dotenv, dotenv_values
+
+from agent.sql import AggregationRAG, LLMUnreliableException
+from db import get_db
+from llm import get_llm, get_raw_llm
 
 @dataclass
 class PendingInferenceComplete:
@@ -40,78 +32,10 @@ class PendingResponseChoice:
     """
     A mapping from llm names → answers
     """
-    
-@functools.cache
-def get_db():
-    """get_db creates the database by loading the inputted CSV file and creating the embeddings
-    which is used by the LLMs to answer queries
-
-    Returns:
-        database: a database used by the LLMs to answer queries
-    """
-    documents = CSVLoader("Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv").load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=250, chunk_overlap=50)
-    split_documents = text_splitter.split_documents(documents)
-    if(False):
-    #if os.path.isdir(".chroma_db"):
-        print("Loading chromadb from filesystem")
-        db = Chroma(
-            persist_directory=".chroma_db",
-            embedding_function=SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
-        )
-    else:
-        print("Creating new embeddings")
-        db = Chroma.from_documents(
-            split_documents,
-            SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2"),
-            ids=[str(i) for i in range(len(split_documents))],
-            persist_directory=".chroma_db"
-        )
-        
-    return db
 
 def query_chain(retriever):
     return (lambda params: params["messages"][-1].content) | retriever
 
-def setup_llama():
-    """sets up the llama LLM 
-
-    Returns:
-        llm: initialised llama LLM
-    """
-    from langchain_community.llms import LlamaCpp
-    from langchain.callbacks.manager import CallbackManager
-    from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-    from llama_cpp import LlamaCache
-    callback_manager = CallbackManager([StreamingStdOutCallbackHandler()])
-    llm = LlamaCpp(
-        model_path= os.getenv('LLAMA_MODEL_PATH'),
-        callback_manager = callback_manager,
-        verbose = True,
-        n_ctx=1024,
-    )
-    llm.client.set_cache(LlamaCache())
-    return llm
-
-def setup_chatgpt():
-    """sets up the chatGPT LLM
-
-    Returns:
-        llm: initialised chatGPT LLM
-    """
-    from langchain_openai import ChatOpenAI
-    llm = ChatOpenAI(temperature = 0.6)
-    return llm
-
-def setup_ai21():
-    """sets up the ai21 LLM
-
-    Returns:
-        llm: initialised ai21 LLM
-    """
-    from langchain_community.llms import AI21
-    llm = AI21(temperature=0)
-    return llm
 
 def set_state(next_state):
     """sets the next state of the LLM
@@ -133,65 +57,6 @@ def get_state():
     global state
     return state
 
-def get_raw_llm(llm_choice):
-    """get_raw_llm returns a langchain chain following a KeyError
-    from get_llm
-
-    Args:
-        llm_choice (String): ai21, chatGPT, llama
-
-    Raises:
-        KeyError: llm_choice is not in raw_llms
-
-    Returns:
-        dict: langchain chain of the sources to be used when answering the question
-    """
-    global raw_llms
-    llm_choice = llm_choice.lower()
-    try:
-        llm = raw_llms[llm_choice]
-    except KeyError:
-        if llm_choice == "llama":
-            setup = setup_llama
-        elif llm_choice == "ai21":
-            setup = setup_ai21
-        elif llm_choice == "chatgpt":
-            setup = setup_chatgpt
-        else:
-            raise KeyError()
-        llm = setup()
-        raw_llms[llm_choice] = llm
-    return raw_llms[llm_choice]
-    
-def get_llm(llm_choice):
-    """get_llm returns a langchain chain which takes as inputs the sources
-    to be used when answering the question.  The backing llm is determined 
-    by the llm choice parameter
-
-    Args:
-        llm_choice (String): ai21, chatGPT, llama
-
-    Returns:
-        dict: langchain chain of the sources to be used when answering the question
-    """
-    global llms
-    llm_choice = llm_choice.lower()
-    try:
-        llm = llms[llm_choice]
-    except KeyError:
-        llm = get_raw_llm(llm_choice)
-        system_prompt = resolve(options["language"], "system_prompt")
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", f"{system_prompt}\n\\{{context}}\n----------"),
-                MessagesPlaceholder(variable_name="messages")
-            ]
-        )
-        document_chain = create_stuff_documents_chain(llm, prompt)
-        chain = RunnablePassthrough.assign(answer=document_chain)
-        llms[llm_choice] = chain
-    return llms[llm_choice]
-
 @dataclass
 class Closure:
     llm: str
@@ -210,8 +75,9 @@ class Closure:
             "answer": whole.get("answer", "")
         })
 
-def _get_data(messages, llm_choices):
-    """_get_data takes in the messages from the chat message history
+
+def _get_data(messages, llm_choices, sql=False):
+  """_get_data takes in the messages from the chat message history
     and your choice of LLMs and returns the answer to the query and the
     sources behind the answer
 
@@ -226,28 +92,27 @@ def _get_data(messages, llm_choices):
     pool = ThreadPoolExecutor(4)
 
     question = messages[-1].content
-    context = get_db().as_retriever(k=1).invoke(question)
+    global filename
+    context = get_db(filename).as_retriever(k=1).invoke(question)
     context_source = RunnablePassthrough.assign(context=lambda _: context)
     
     for llm_choice in llm_choices:
+        llm = get_raw_llm(llm_choice)
         chain = context_source | get_llm(llm_choice)
         print(f"Submitting task for `{llm_choice}`")
-        job = pool.submit(infer, messages, chain, Closure(llm_choice))
+        job = pool.submit(infer, messages, llm, chain, Closure(llm_choice), sql=sql)
         jobs.append((llm_choice, job))
 
     answers = []
         
     for llm, job in jobs:
         answer = job.result()
-        answers.append({
-            "llm": llm,
-            "answer": answer["answer"]
-        })
+        answers.append({ **answer, "llm": llm })
     
     return answers, context
 
-def infer(messages, chain, callback):
-    """ Uses the last element in the messages array as a question and 
+def infer(messages, llm, chain, callback, sql=False):
+  """ Uses the last element in the messages array as a question and 
     generates a response using the provided LLM chain and the review database. 
     The chain should accept a 'messages' argument into which the messages will be inserted. 
     If possible, LLM output will be streamed and for each new update the callback will be invoked 
@@ -262,8 +127,28 @@ def infer(messages, chain, callback):
     Returns:
         dict: a response to the provided query
     """
+    if sql:
+        print("Running pre-inference step")
+        try:
+            agg = AggregationRAG(llm, verbose=True, notify_cb=lambda event: callback({}, { "answer" : event }))
+            result = agg.answer(messages[-1])
+            if result is not None:
+                full = { **result.__dict__, "type" : "tabular" }
+                return full
+            else:
+                print("got empty result, but things were otherwise okay")
+        except LLMUnreliableException as e:
+            print(f"LLM not reliable: {e}")
+    else:
+        print("SQL Aggregation tool disabled")
+
     print("Starting inference for LLM")
-    payload = { "messages": messages }
+    payload = {
+        "messages": [
+            *messages,
+            SystemMessage(content="No tabular output could be generated. Use the sources provided to answer the question. Note that these sources are limited.")
+        ]
+    }
     full = None
     for item in chain.stream(payload):
         if full is None:
@@ -272,13 +157,10 @@ def infer(messages, chain, callback):
             full += item
         if callback is not None:
             callback(item, full)
-    return full
+    return { "type" : "regular", "answer" : full["answer"] }
 
 set_state(None)
-llms = {}
-raw_llms = {}
 memory = ChatMessageHistory()
-options = { "language" : "English" }
 
 
 def refresh_environment_vars():
@@ -291,6 +173,7 @@ if __name__ == "__main__":
     from flask import Flask, request, jsonify
     from flask_cors import CORS
     from flask_socketio import SocketIO
+    from os import listdir
     app = Flask(__name__)
     socketio = SocketIO(app, cors_allowed_origins="*")
     CORS(app)
@@ -301,7 +184,8 @@ if __name__ == "__main__":
         open('.env', 'w')
         load_dotenv('.env')
     refresh_environment_vars()
-
+    global filename
+    filename = "_Datafiniti_Amazon_Consumer_Reviews_of_Amazon_Products.csv"
     @app.route('/message', methods=['POST'])
     def get_data():
         """get_data returns the answers and sources for a query
@@ -321,11 +205,19 @@ if __name__ == "__main__":
         if len(llm_choices) == 0:
             return jsonify(answers={})
         message = data.get('message')
+        sql = data.get('sql')
         set_state(PendingInferenceComplete(data=data))
         memory.add_user_message(message)
-        answers, sources = _get_data(memory.messages, llm_choices)
-        set_state(PendingResponseChoice(answers={ answer["llm"]: answer["answer"] for answer in answers }))
-        return jsonify({ "answers": answers, "sources" : [source.page_content for source in sources] })
+        answers, sources = _get_data(memory.messages, llm_choices, sql=sql)
+        set_state(PendingResponseChoice(answers={ answer["llm"]: answer for answer in answers }))
+        return jsonify({
+            "answers": answers,
+            "sources" : [ { "pageContent" : source.page_content,
+                            "title" : source.metadata["title"],
+                            "rating" : source.metadata["rating"],
+                            "productName" : source.metadata["name"] }
+                          for source in sources ]
+        })
     
     
     @app.route('/selectAnswer', methods=['POST'])
@@ -341,10 +233,32 @@ if __name__ == "__main__":
             return jsonify(400)
         chosen_answer = data.get('llm')
         global memory
-        memory.add_ai_message(state.answers[chosen_answer.lower()])
+        chosen_answer = state.answers[chosen_answer.lower()]
+        if chosen_answer["type"] == "tabular":
+            memory.add_ai_message("[This question was answered in a tabular format, which was presented in the UI]")
+        else:
+            memory.add_ai_message(chosen_answer["answer"])
         set_state(None)
         return jsonify(200)
 
+
+    @app.route('/setFile', methods=['POST'])
+    def set_file():
+        data = request.json
+        global filename
+        filename = data.get('file')
+        print('Updated filename to: "' + filename + '"')
+        return jsonify(200)
+
+    @app.route('/files', methods=['POST'])
+    def get_files():
+        files = []
+        for file in listdir("."):
+            if file.endswith(".csv"):
+                print(file)
+                files.append(file)
+
+        return jsonify({"files" : files})
 
     @app.route('/config', methods=['POST'])
     def config_llm():

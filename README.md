@@ -72,6 +72,6 @@ Please note that the frontend should be run in a terminal seperate from the back
 
 This is what the program should look like:
 
-![alt text](https://github.com/Antyk45/IBM-Chatbot/blob/dylan/images/Image%20files/Frontend%20image.png "FeedBot Frontend Example")
+![alt_text](Image%20files/Frontend%20image.png)
 
-![alt text](https://github.com/Antyk45/IBM-Chatbot/blob/dylan/images/Image%20files/Query%20image.png "FeedBot Query Example")
+![alt_text](Image%20files/Query%20image.png)
