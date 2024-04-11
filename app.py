@@ -77,7 +77,7 @@ class Closure:
 
 
 def _get_data(messages, llm_choices, sql=False):
-  """_get_data takes in the messages from the chat message history
+    """_get_data takes in the messages from the chat message history
     and your choice of LLMs and returns the answer to the query and the
     sources behind the answer
 
@@ -112,7 +112,7 @@ def _get_data(messages, llm_choices, sql=False):
     return answers, context
 
 def infer(messages, llm, chain, callback, sql=False):
-  """ Uses the last element in the messages array as a question and 
+    """ Uses the last element in the messages array as a question and 
     generates a response using the provided LLM chain and the review database. 
     The chain should accept a 'messages' argument into which the messages will be inserted. 
     If possible, LLM output will be streamed and for each new update the callback will be invoked 
