@@ -93,7 +93,7 @@ function ChatWithMe() {
         ...props
     }) => {
         const body = <AnswerBody answer={{...props, type}}/>;
-        const isBestllm = bestLlm.includes(llm);
+        const isBestllm = bestLlm && bestLlm.includes(llm);
         const sourceBody = type == "tabular"
               ? <>
                     <h4>generated query</h4>
@@ -165,7 +165,7 @@ function ChatWithMe() {
                     setChatHistory(chatHistory => [...chatHistory, { sender: 'user', message: { answer: message } }]);
                     setAnswers(Object.fromEntries(response.data.answers.map(answer => [answer.llm, answer])));
                     setSources(response.data.sources);
-                    setBestLlm(response.data.best_llm);
+                    setBestLlm(response.data.best_llm || []);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
