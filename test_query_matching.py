@@ -17,15 +17,15 @@ collection = db["feature_ranking"]
 def test_get_best_LLM():
     User_id = "get_best_LLM"
     query1 = "What is the best kindle?"
-    llm1 = "OpenAI"
-    llm2 = "AI21"
-    llm3 = "LLAMA"
+    llm1 = "chatgpt"
+    llm2 = "ai21"
+    llm3 = "llama"
     query2 = "What kindle is the best?"
 
     feature_ranking.addRating3(User_id, query2, llm1, 5.0, llm2, 4.0, llm3, 2.0)
     feature_ranking.addRating3(User_id, query1, llm1, 0.0, llm2, 0.0, llm3, 0.0)
 
-    assert query_matching.get_best_LLM("What is the best kindle?") == ["OpenAI"] # Test for multiple positive ratings
+    assert query_matching.get_best_LLM("What is the best kindle?") == ["chatgpt"] # Test for multiple positive ratings
     #assert query_matching.get_best_LLM("Is the battery life good on the kindles, which is best?") == None  # Test for no positive ratings
-   # assert query_matching.get_best_LLM("What is the weather like today") == None # Test for no similar queries
+   #assert query_matching.get_best_LLM("What is the weather like today") == None # Test for no similar queries
     collection.delete_many({"User_id": "get_best_LLM"})
